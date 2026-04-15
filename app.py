@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -13,10 +13,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.get("/")
-def root():
-    return {"status": "API running"}
 
 @app.get("/top")
 def top():
+    return {"message": "Libralys API OK"}
+
+# ★これを追加
+@app.get("/api/ui/top")
+def top_ui():
     return {"message": "Libralys API OK"}
