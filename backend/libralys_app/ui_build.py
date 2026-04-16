@@ -1,165 +1,100 @@
-// ============================================================
-// Libralys Navigation State Manager
-// ============================================================
+# ============================================================
+# UI Builder（Streamlit完全再現）
+# ============================================================
 
-export const LANG_KEY = "lang";
-export const NAV_PAGE_ROUTER_KEY = "_lib_nav_route";
-export const NAV_PENDING_KEY = "_lib_nav_pending";
-export const PAGE_HISTORY_STACK_KEY = "_lib_page_stack";
-export const PAGE_HISTORY_LAST_KEY = "_lib_last_committed_page";
-export const MAX_PAGE_HISTORY = 24;
+def build_ui_top(lang: str = "ja"):
 
-export const PAGES = [
-  "TOP",
-  "はじめての方へ",
-  "業務内容",
-  "業務の流れ",
-  "AI分析ツール",
-  "AI評価研究グループ",
-  "価格の目利き",
-  "市場分析",
-  "DCFシミュレータ",
-  "不動産鑑定士マッチング",
-  "実績・ケーススタディ",
-  "会社概要",
-  "代表プロフィール",
-  "AI思想（Methodology）",
-  "企業統治（Governance）",
-  "情報セキュリティ（ISMS相当）",
-  "倫理規程・不動産鑑定士職業倫理",
-  "プライバシー",
-  "お問い合わせ",
-];
+    return {
+        "title": "ライブラリーズ",
+        "meta": {
+            "streamlitTop": True,
+            "hidePageTitle": True
+        },
+        "sections": [
 
-const _PAGE_SET = new Set(PAGES);
+            # ---------------- HERO ----------------
+            {
+                "type": "hero",
+                "layout": "streamlit",
+                "meta": {
+                    "headline": "不動産鑑定 × AI分析",
+                    "subcopy_lines": [
+                        "価格の見える化を実現",
+                        "データとロジックで価値を説明する"
+                    ],
+                    "background": "/image/ai_realestate_bg.jpg",
+                    "ctas": [
+                        {"label": "業務内容を見る", "target": "#/services"},
+                        {"label": "分析ツールへ", "target": "#/dcf"}
+                    ]
+                }
+            },
 
-/*
- English slug to internal page mapping
-*/
-const HASH_SLUG_TO_PAGE = {
-  top: "TOP",
-  services: "業務内容",
-  mekiki: "価格の目利き",
-  market: "市場分析",
-  dcf: "DCFシミュレータ",
-};
+            # ---------------- QUICK NAV ----------------
+            {
+                "type": "cards",
+                "layout": "streamlit-nav",
+                "items": [
+                    {"title": "業務内容", "target": "#/services"},
+                    {"title": "市場分析", "target": "#/market"},
+                    {"title": "DCF", "target": "#/dcf"},
+                ]
+            },
 
-/*
- Page key to slug mapping
-*/
-const PAGE_TO_HASH_SLUG = {
-  TOP: "top",
-  業務内容: "services",
-  価格の目利き: "mekiki",
-  市場分析: "market",
-  DCFシミュレータ: "dcf",
-};
+            # ---------------- NEWS ----------------
+            {
+                "type": "markup",
+                "layout": "top-news",
+                "meta": {
+                    "html": """
+                    <div class='news'>
+                        <p>2026.04 サイト公開</p>
+                        <p>AI分析機能を強化</p>
+                    </div>
+                    """
+                }
+            },
 
-export function isValidPage(page) {
-  return _PAGE_SET.has(page);
-}
+            # ---------------- TRENDS ----------------
+            {
+                "type": "trends",
+                "meta": {
+                    "items": [
+                        {"label": "地価動向", "value": "+2.3%"},
+                        {"label": "建築費", "value": "+5.1%"},
+                        {"label": "金利", "value": "0.75%"},
+                    ]
+                }
+            },
 
-export function getHashHref(page) {
-  if (!isValidPage(page)) return "#/top";
-  const seg = PAGE_TO_HASH_SLUG[page] ?? encodeURIComponent(page);
-  return "#/" + seg;
-}
+            # ---------------- SERVICES ----------------
+            {
+                "type": "cards",
+                "layout": "streamlit-service",
+                "title": "業務内容",
+                "items": [
+                    {"title": "鑑定評価", "text": "公的評価対応"},
+                    {"title": "AI分析", "text": "価格推定・可視化"},
+                    {"title": "コンサル", "text": "投資判断支援"},
+                ]
+            },
 
-export function getHashPage() {
-  const raw = (location.hash || "").replace(/^#\/?/, "").trim();
-  if (!raw) return "TOP";
-
-  let decoded;
-  try {
-    decoded = decodeURIComponent(raw);
-  } catch (e) {
-    decoded = raw;
-  }
-
-  const bySlug = HASH_SLUG_TO_PAGE[String(decoded).toLowerCase()];
-  if (bySlug) return bySlug;
-
-  return isValidPage(decoded) ? decoded : "TOP";
-}
-
-export function setHashPage(page) {
-  if (!isValidPage(page)) return;
-  const seg = PAGE_TO_HASH_SLUG[page] ?? encodeURIComponent(page);
-  const h = "#/" + seg;
-  if (location.hash !== h) location.hash = h;
-}
-
-export function readSession(key, fallback = null) {
-  try {
-    const v = sessionStorage.getItem(key);
-    return v === null || v === "" ? fallback : v;
-  } catch (e) {
-    return fallback;
-  }
-}
-
-export function writeSession(key, value) {
-  try {
-    if (value === null || value === undefined) {
-      sessionStorage.removeItem(key);
-    } else {
-      sessionStorage.setItem(key, String(value));
+            # ---------------- NAV MULTI ----------------
+            {
+                "type": "cards",
+                "layout": "streamlit-nav-multi",
+                "meta": {
+                    "groups": [
+                        [
+                            {"title": "価格の目利き", "target": "#/mekiki"},
+                            {"title": "AI分析", "target": "#/ai"}
+                        ],
+                        [
+                            {"title": "会社概要", "target": "#/company"},
+                            {"title": "お問い合わせ", "target": "#/contact"}
+                        ]
+                    ]
+                }
+            }
+        ]
     }
-  } catch (e) {}
-}
-
-export function readJsonSession(key, fallback) {
-  try {
-    const v = sessionStorage.getItem(key);
-    if (!v) return fallback;
-    return JSON.parse(v);
-  } catch (e) {
-    return fallback;
-  }
-}
-
-export function writeJsonSession(key, obj) {
-  try {
-    sessionStorage.setItem(key, JSON.stringify(obj));
-  } catch (e) {}
-}
-
-export function pushPageHistory(currentPage) {
-  if (!isValidPage(currentPage)) return;
-
-  const last = readSession(PAGE_HISTORY_LAST_KEY, null);
-
-  if (last === null) {
-    writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
-    return;
-  }
-
-  if (last === currentPage) return;
-
-  const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
-  stack.push(last);
-
-  while (stack.length > MAX_PAGE_HISTORY) {
-    stack.shift();
-  }
-
-  writeJsonSession(PAGE_HISTORY_STACK_KEY, stack);
-  writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
-}
-
-export function popPageHistory() {
-  const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
-  return stack.length ? stack.pop() : "TOP";
-}
-
-export function applyPendingNav() {
-  const pending = readSession(NAV_PENDING_KEY, null);
-
-  if (pending && isValidPage(pending)) {
-    writeSession(NAV_PENDING_KEY, "");
-    setHashPage(pending);
-    return pending;
-  }
-
-  return null;
-}
