@@ -33,7 +33,9 @@ export const PAGES = [
 
 const _PAGE_SET = new Set(PAGES);
 
-/** 英語スラッグ → 内部ページ */
+/*
+ 英語スラッグ -> 内部ページ
+*/
 const HASH_SLUG_TO_PAGE = {
   top: "TOP",
   services: "業務内容",
@@ -42,7 +44,9 @@ const HASH_SLUG_TO_PAGE = {
   dcf: "DCFシミュレータ",
 };
 
-/** ページ → スラッグ */
+/*
+ ページ -> スラッグ
+*/
 const PAGE_TO_HASH_SLUG = {
   TOP: "top",
   業務内容: "services",
