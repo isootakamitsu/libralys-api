@@ -29,7 +29,7 @@ export const PAGES = [
 
 const _PAGE_SET = new Set(PAGES);
 
-
+/** 英語スラッグ → 内部ページ */
 const HASH_SLUG_TO_PAGE = {
   top: "TOP",
   services: "業務内容",
@@ -38,19 +38,18 @@ const HASH_SLUG_TO_PAGE = {
   dcf: "DCFシミュレータ",
 };
 
-
+/** ページ → スラッグ */
 const PAGE_TO_HASH_SLUG = {
-  TOP: "top",
-  業務内容: "services",
-  価格の目利き: "mekiki",
-  市場分析: "market",
-  DCFシミュレータ: "dcf",
+  "TOP": "top",
+  "業務内容": "services",
+  "価格の目利き": "mekiki",
+  "市場分析": "market",
+  "DCFシミュレータ": "dcf",
 };
 
 export function isValidPage(page) {
   return _PAGE_SET.has(page);
 }
-
 
 export function getHashHref(page) {
   if (!isValidPage(page)) return "#/top";
@@ -61,20 +60,18 @@ export function getHashHref(page) {
 export function getHashPage() {
   const raw = (location.hash || "").replace(/^#\/?/, "").trim();
   if (!raw) return "TOP";
+
+  let decoded;
   try {
-    const decoded = decodeURIComponent(raw);
-    const bySlug = HASH_SLUG_TO_PAGE[decoded.toLowerCase()];
-    if (bySlug) return bySlug;
-    return isValidPage(decoded) ? decoded : "TOP";
+    decoded = decodeURIComponent(raw);
   } catch {
-    try {
-      const bySlug2 = HASH_SLUG_TO_PAGE[raw.toLowerCase()];
-      if (bySlug2) return bySlug2;
-      return isValidPage(raw) ? raw : "TOP";
-    } catch {
-      return "TOP";
-    }
+    decoded = raw;
   }
+
+  const bySlug = HASH_SLUG_TO_PAGE[String(decoded).toLowerCase()];
+  if (bySlug) return bySlug;
+
+  return isValidPage(decoded) ? decoded : "TOP";
 }
 
 export function setHashPage(page) {
@@ -116,35 +113,40 @@ export function writeJsonSession(key, obj) {
   } catch {}
 }
 
-
 export function pushPageHistory(currentPage) {
   if (!isValidPage(currentPage)) return;
+
   const last = readSession(PAGE_HISTORY_LAST_KEY, null);
+
   if (last === null) {
     writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
     return;
   }
+
   if (last === currentPage) return;
+
   const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
   stack.push(last);
+
   while (stack.length > MAX_PAGE_HISTORY) stack.shift();
+
   writeJsonSession(PAGE_HISTORY_STACK_KEY, stack);
   writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
 }
 
 export function popPageHistory() {
   const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
-  if (stack.length) return stack.pop();
-  return "TOP";
+  return stack.length ? stack.pop() : "TOP";
 }
 
 export function applyPendingNav() {
   const pending = readSession(NAV_PENDING_KEY, null);
+
   if (pending && isValidPage(pending)) {
     writeSession(NAV_PENDING_KEY, "");
     setHashPage(pending);
     return pending;
   }
+
   return null;
 }
-
