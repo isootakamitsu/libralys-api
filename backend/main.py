@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# ★ これが重要（routes_ui を使う）
+from libralys_app.routes_ui import router as ui_router
+
 app = FastAPI()
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://libralys.com", "https://www.libralys.com"],
@@ -11,26 +15,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ルート確認
 @app.get("/")
 def root():
-    return {"status": "ok"}
+    return {
+        "service": "Libralys API",
+        "docs": "/docs"
+    }
 
+# texts（必要）
 @app.get("/api/texts")
 def api_texts():
     return {
-        "ja": {
-            "brand_company": "ライブラリーズ"
-        },
-        "en": {
-            "brand_company": "Libralys"
-        }
+        "ja": {"brand_company": "ライブラリーズ"},
+        "en": {"brand_company": "Libralys"}
     }
 
-# ←ここから追加
-@app.get("/api/ui/top")
-def ui_top(lang: str = "ja"):
-    return {
-        "title": "ライブラリーズ",
-        "subtitle": "不動産鑑定 × AI分析",
-        "sections": []
-    }
+# ★ ここが最重要
+app.include_router(ui_router)
