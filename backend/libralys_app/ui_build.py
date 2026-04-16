@@ -1,11 +1,8 @@
-/**
- * /api/ui/* の JSON（title + sections）から DOM を組み立てる。
- */
 import * as R from "./router.js";
 
 const DEFAULT_TIMEOUT_MS = 18000;
 
-/** API の `section.layout` 値（ハイフン付きは必ず文字列として扱う／識別子に使わない） */
+
 const UI_LAYOUT = {
   STREAMLIT: "streamlit",
   STREAMLIT_NAV: "streamlit-nav",
@@ -22,7 +19,7 @@ function sectionLayout(sec) {
   return sec.layout || m.layout || UI_LAYOUT.DEFAULT;
 }
 
-/** deps.T があれば /api/texts のキーを解決（既に表示用の文面ならそのまま）。 */
+
 function uiT(deps, s) {
   if (deps && typeof deps.T === "function") return deps.T(String(s ?? ""));
   return String(s ?? "");
@@ -1036,7 +1033,7 @@ function handleMailto(host, deps) {
   window.location.href = "mailto:" + em + "?subject=" + subj + "&body=" + b;
 }
 
-/** メールアドレスを .ui-page に付与（contact UI 用） */
+
 export function patchOfficeEmail(host, email) {
   const r = host.querySelector(".ui-page");
   if (r && email) r.setAttribute("data-office-email", email);
