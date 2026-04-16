@@ -11,15 +11,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {"status": "ok"}
+
 @app.get("/api/texts")
 def api_texts():
     return {
         "ja": {
-            "brand_company": "ライブラリーズ",
-            "site_catchphrase": "不動産鑑定 × AI分析"
+            "brand_company": "ライブラリーズ"
         },
         "en": {
-            "brand_company": "Libralys",
-            "site_catchphrase": "Real Estate Appraisal × AI"
+            "brand_company": "Libralys"
         }
+    }
+
+# ←ここから追加
+@app.get("/api/ui/top")
+def ui_top(lang: str = "ja"):
+    return {
+        "title": "ライブラリーズ",
+        "subtitle": "不動産鑑定 × AI分析",
+        "sections": []
     }
