@@ -1,3 +1,7 @@
+// ============================================================
+// Libralys Navigation State Manager
+// ============================================================
+
 export const LANG_KEY = "lang";
 export const NAV_PAGE_ROUTER_KEY = "_lib_nav_route";
 export const NAV_PENDING_KEY = "_lib_nav_pending";
@@ -40,11 +44,11 @@ const HASH_SLUG_TO_PAGE = {
 
 /** ページ → スラッグ */
 const PAGE_TO_HASH_SLUG = {
-  "TOP": "top",
-  "業務内容": "services",
-  "価格の目利き": "mekiki",
-  "市場分析": "market",
-  "DCFシミュレータ": "dcf",
+  TOP: "top",
+  業務内容: "services",
+  価格の目利き: "mekiki",
+  市場分析: "market",
+  DCFシミュレータ: "dcf",
 };
 
 export function isValidPage(page) {
@@ -64,7 +68,7 @@ export function getHashPage() {
   let decoded;
   try {
     decoded = decodeURIComponent(raw);
-  } catch {
+  } catch (e) {
     decoded = raw;
   }
 
@@ -85,16 +89,19 @@ export function readSession(key, fallback = null) {
   try {
     const v = sessionStorage.getItem(key);
     return v === null || v === "" ? fallback : v;
-  } catch {
+  } catch (e) {
     return fallback;
   }
 }
 
 export function writeSession(key, value) {
   try {
-    if (value === null || value === undefined) sessionStorage.removeItem(key);
-    else sessionStorage.setItem(key, String(value));
-  } catch {}
+    if (value === null || value === undefined) {
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, String(value));
+    }
+  } catch (e) {}
 }
 
 export function readJsonSession(key, fallback) {
@@ -102,7 +109,7 @@ export function readJsonSession(key, fallback) {
     const v = sessionStorage.getItem(key);
     if (!v) return fallback;
     return JSON.parse(v);
-  } catch {
+  } catch (e) {
     return fallback;
   }
 }
@@ -110,7 +117,7 @@ export function readJsonSession(key, fallback) {
 export function writeJsonSession(key, obj) {
   try {
     sessionStorage.setItem(key, JSON.stringify(obj));
-  } catch {}
+  } catch (e) {}
 }
 
 export function pushPageHistory(currentPage) {
@@ -128,7 +135,9 @@ export function pushPageHistory(currentPage) {
   const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
   stack.push(last);
 
-  while (stack.length > MAX_PAGE_HISTORY) stack.shift();
+  while (stack.length > MAX_PAGE_HISTORY) {
+    stack.shift();
+  }
 
   writeJsonSession(PAGE_HISTORY_STACK_KEY, stack);
   writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
