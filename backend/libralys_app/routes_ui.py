@@ -29,7 +29,7 @@ export const PAGES = [
 
 const _PAGE_SET = new Set(PAGES);
 
-/** 英語スラッグ（#/top 等）→ 内部ページキー（PAGES の文字列） */
+
 const HASH_SLUG_TO_PAGE = {
   top: "TOP",
   services: "業務内容",
@@ -38,7 +38,7 @@ const HASH_SLUG_TO_PAGE = {
   dcf: "DCFシミュレータ",
 };
 
-/** ページキー → 短いハッシュセグメント（未定義のページは encodeURIComponent(page)） */
+
 const PAGE_TO_HASH_SLUG = {
   TOP: "top",
   業務内容: "services",
@@ -51,7 +51,7 @@ export function isValidPage(page) {
   return _PAGE_SET.has(page);
 }
 
-/** パンくず等用の href 値（#/… のみ） */
+
 export function getHashHref(page) {
   if (!isValidPage(page)) return "#/top";
   const seg = PAGE_TO_HASH_SLUG[page] ?? encodeURIComponent(page);
@@ -116,7 +116,7 @@ export function writeJsonSession(key, obj) {
   } catch {}
 }
 
-/** Streamlit push_page_history に相当（同一ページ連続では積まない） */
+
 export function pushPageHistory(currentPage) {
   if (!isValidPage(currentPage)) return;
   const last = readSession(PAGE_HISTORY_LAST_KEY, null);
