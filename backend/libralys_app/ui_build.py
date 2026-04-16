@@ -1,169 +1,165 @@
-import * as R from "./router.js";
+// ============================================================
+// Libralys Navigation State Manager
+// ============================================================
 
-const DEFAULT_TIMEOUT_MS = 18000;
+export const LANG_KEY = "lang";
+export const NAV_PAGE_ROUTER_KEY = "_lib_nav_route";
+export const NAV_PENDING_KEY = "_lib_nav_pending";
+export const PAGE_HISTORY_STACK_KEY = "_lib_page_stack";
+export const PAGE_HISTORY_LAST_KEY = "_lib_last_committed_page";
+export const MAX_PAGE_HISTORY = 24;
 
-/* =========================
-   安全ユーティリティ
-========================= */
-function safeStr(v) {
-  return v == null ? "" : String(v);
-}
+export const PAGES = [
+  "TOP",
+  "はじめての方へ",
+  "業務内容",
+  "業務の流れ",
+  "AI分析ツール",
+  "AI評価研究グループ",
+  "価格の目利き",
+  "市場分析",
+  "DCFシミュレータ",
+  "不動産鑑定士マッチング",
+  "実績・ケーススタディ",
+  "会社概要",
+  "代表プロフィール",
+  "AI思想（Methodology）",
+  "企業統治（Governance）",
+  "情報セキュリティ（ISMS相当）",
+  "倫理規程・不動産鑑定士職業倫理",
+  "プライバシー",
+  "お問い合わせ",
+];
 
-/* =========================
-   UI設定
-========================= */
-const UI_LAYOUT = {
-  STREAMLIT: "streamlit",
-  STREAMLIT_NAV: "streamlit-nav",
-  STREAMLIT_NAV_MULTI: "streamlit-nav-multi",
-  STREAMLIT_SERVICE: "streamlit-service",
-  STREAMLIT_MARKET: "streamlit-market",
-  TOP_NEWS: "top-news",
-  NAV: "nav",
-  DEFAULT: "default",
+const _PAGE_SET = new Set(PAGES);
+
+/*
+ English slug to internal page mapping
+*/
+const HASH_SLUG_TO_PAGE = {
+  top: "TOP",
+  services: "業務内容",
+  mekiki: "価格の目利き",
+  market: "市場分析",
+  dcf: "DCFシミュレータ",
 };
 
-function sectionLayout(sec) {
-  const m = (sec && sec.meta) || {};
-  return sec?.layout || m.layout || UI_LAYOUT.DEFAULT;
+/*
+ Page key to slug mapping
+*/
+const PAGE_TO_HASH_SLUG = {
+  TOP: "top",
+  業務内容: "services",
+  価格の目利き: "mekiki",
+  市場分析: "market",
+  DCFシミュレータ: "dcf",
+};
+
+export function isValidPage(page) {
+  return _PAGE_SET.has(page);
 }
 
-function uiT(deps, s) {
-  if (deps && typeof deps.T === "function") return deps.T(String(s ?? ""));
-  return String(s ?? "");
+export function getHashHref(page) {
+  if (!isValidPage(page)) return "#/top";
+  const seg = PAGE_TO_HASH_SLUG[page] ?? encodeURIComponent(page);
+  return "#/" + seg;
 }
 
-/* =========================
-   トレンド関連
-========================= */
+export function getHashPage() {
+  const raw = (location.hash || "").replace(/^#\/?/, "").trim();
+  if (!raw) return "TOP";
 
-function tierBadgeClass(tier) {
-  const t = safeStr(tier);
-  if (t === "公的") return "lib-trend-badge lib-trend-badge--tier-ko";
-  if (t === "業界") return "lib-trend-badge lib-trend-badge--tier-gy";
-  return "lib-trend-badge lib-trend-badge--tier-oth";
-}
-
-function fmtTrendScore(template, score) {
-  const n = Number(score) || 0;
-  return safeStr(template)
-    .replace("{score:.2f}", n.toFixed(2))
-    .replace("{score}", String(n));
-}
-
-function passTrendFilters(row, catFilter, srcFilter, lbl) {
-  if (catFilter !== lbl.trend_cat_all && safeStr(row.category) !== catFilter) return false;
-  if (srcFilter === lbl.trend_src_all) return true;
-
-  const sk = safeStr(row.source_key).toLowerCase();
-
-  if (srcFilter === lbl.trend_src_kokudo) return sk === "kokudo";
-  if (srcFilter === lbl.trend_src_sanki) return sk === "sanki";
-  if (srcFilter === lbl.trend_src_reit) return sk === "reit";
-  if (srcFilter === lbl.trend_src_other)
-    return sk !== "kokudo" && sk !== "sanki" && sk !== "reit";
-
-  return true;
-}
-
-/* =========================
-   HTMLエスケープ
-========================= */
-function escapeHtmlStatic(s) {
-  return safeStr(s).replace(/[&<>"']/g, function (c) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    }[c];
-  });
-}
-
-/* =========================
-   API通信
-========================= */
-async function fetchWithTimeout(url, options, timeoutMs) {
-  const ctrl = new AbortController();
-  const id = setTimeout(function () {
-    ctrl.abort();
-  }, timeoutMs);
-
+  let decoded;
   try {
-    const r = await fetch(url, Object.assign({}, options, { signal: ctrl.signal }));
-    return r;
-  } finally {
-    clearTimeout(id);
+    decoded = decodeURIComponent(raw);
+  } catch (e) {
+    decoded = raw;
+  }
+
+  const bySlug = HASH_SLUG_TO_PAGE[String(decoded).toLowerCase()];
+  if (bySlug) return bySlug;
+
+  return isValidPage(decoded) ? decoded : "TOP";
+}
+
+export function setHashPage(page) {
+  if (!isValidPage(page)) return;
+  const seg = PAGE_TO_HASH_SLUG[page] ?? encodeURIComponent(page);
+  const h = "#/" + seg;
+  if (location.hash !== h) location.hash = h;
+}
+
+export function readSession(key, fallback = null) {
+  try {
+    const v = sessionStorage.getItem(key);
+    return v === null || v === "" ? fallback : v;
+  } catch (e) {
+    return fallback;
   }
 }
 
-export async function fetchUiJson(apiUrl, segment, lang, timeoutMs) {
-  const ms = timeoutMs || DEFAULT_TIMEOUT_MS;
-  const q = "?lang=" + encodeURIComponent(lang);
-  const url = apiUrl("/api/ui/" + segment + q);
-
-  const r = await fetchWithTimeout(
-    url,
-    { method: "GET", headers: { Accept: "application/json" } },
-    ms
-  );
-
-  if (!r.ok) throw new Error(url + " → " + r.status);
-
-  return JSON.parse(await r.text());
+export function writeSession(key, value) {
+  try {
+    if (value === null || value === undefined) {
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, String(value));
+    }
+  } catch (e) {}
 }
 
-/* =========================
-   表示
-========================= */
-export function showLoading(host) {
-  host.innerHTML = '<div class="ui-loading"><p>Loading…</p></div>';
+export function readJsonSession(key, fallback) {
+  try {
+    const v = sessionStorage.getItem(key);
+    if (!v) return fallback;
+    return JSON.parse(v);
+  } catch (e) {
+    return fallback;
+  }
 }
 
-export function showFetchError(host, title, err) {
-  const msg = safeStr((err && err.message) || err);
-  host.innerHTML =
-    '<div class="ui-error">' +
-    "<h1>" + escapeHtmlStatic(title) + "</h1>" +
-    "<pre>" + escapeHtmlStatic(msg) + "</pre>" +
-    "</div>";
+export function writeJsonSession(key, obj) {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(obj));
+  } catch (e) {}
 }
 
-/* =========================
-   ページ描画（最小安定版）
-========================= */
-export function renderUIPage(host, data, deps) {
-  const escapeHtml = (deps && deps.escapeHtml) || escapeHtmlStatic;
+export function pushPageHistory(currentPage) {
+  if (!isValidPage(currentPage)) return;
 
-  const title = safeStr(data && data.title);
-  const sections = (data && data.sections) || [];
+  const last = readSession(PAGE_HISTORY_LAST_KEY, null);
 
-  if (!sections.length) {
-    host.innerHTML = '<div class="ui-empty">No content (sections empty)</div>';
+  if (last === null) {
+    writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
     return;
   }
 
-  let html = "";
+  if (last === currentPage) return;
 
-  for (let i = 0; i < sections.length; i++) {
-    const sec = sections[i];
-    html += "<section><h2>" + escapeHtml(sec.title || "") + "</h2></section>";
+  const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
+  stack.push(last);
+
+  while (stack.length > MAX_PAGE_HISTORY) {
+    stack.shift();
   }
 
-  host.innerHTML = html;
+  writeJsonSession(PAGE_HISTORY_STACK_KEY, stack);
+  writeSession(PAGE_HISTORY_LAST_KEY, currentPage);
 }
 
-/* =========================
-   ナビ操作
-========================= */
-function wireUiInteractions(host) {
-  const els = host.querySelectorAll("[data-hash-target]");
-  for (let i = 0; i < els.length; i++) {
-    const el = els[i];
-    el.addEventListener("click", function () {
-      const h = el.getAttribute("data-hash-target");
-      if (h) location.hash = h;
-    });
+export function popPageHistory() {
+  const stack = readJsonSession(PAGE_HISTORY_STACK_KEY, []);
+  return stack.length ? stack.pop() : "TOP";
+}
+
+export function applyPendingNav() {
+  const pending = readSession(NAV_PENDING_KEY, null);
+
+  if (pending && isValidPage(pending)) {
+    writeSession(NAV_PENDING_KEY, "");
+    setHashPage(pending);
+    return pending;
   }
+
+  return null;
 }
