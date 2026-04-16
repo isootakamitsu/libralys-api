@@ -1,7 +1,3 @@
-/**
- * ページ遷移はハッシュ（#/…）のみ。クエリ文字列によるページ指定は行わない。
- * ハッシュ形式: #/<segment> … segment は PAGES のキー（encodeURIComponent）または英語スラッグ（top / services / mekiki）。
- */
 export const LANG_KEY = "lang";
 export const NAV_PAGE_ROUTER_KEY = "_lib_nav_route";
 export const NAV_PENDING_KEY = "_lib_nav_pending";
