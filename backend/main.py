@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://libralys.com"],
+    allow_origins=["*"],  # ← 一時的に全許可
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
