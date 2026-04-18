@@ -7,14 +7,22 @@
 # 実行: streamlit run streamlit_app.py（本リポジトリ＝Render 本番と同一）
 # ============================================================
 
+import sys
+from pathlib import Path
+
+# Render / 任意 cwd でも `from lib...` が解決されるようリポジトリ根を先頭に追加
+_APP_ROOT = Path(__file__).resolve().parent
+_root_s = str(_APP_ROOT)
+if _root_s not in sys.path:
+    sys.path.insert(0, _root_s)
+
 import streamlit as st
-# ===== 通常ページ（動作確認用） =====
-st.write("APP OK")
-# ===== sitemap用（最優先で実行） =====
-query_params = st.query_params
 
+# sitemap 用（最優先で実行）
+query_params = st.query_params
 if "sitemap" in query_params:
-    st.code("""<?xml version="1.0" encoding="UTF-8"?>
+    st.code(
+        """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
@@ -29,36 +37,11 @@ if "sitemap" in query_params:
     <loc>https://libralys.com/?page=dcf</loc>
   </url>
 
-</urlset>""")
+</urlset>""",
+        language="xml",
+    )
     st.stop()
 
-
-# ===== ここに追加 =====
-query_params = st.query_params
-
-if "sitemap" in query_params:
-    st.text("""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://libralys.com/</loc>
-  </url>
-
-  <url>
-    <loc>https://libralys.com/?page=service</loc>
-  </url>
-
-  <url>
-    <loc>https://libralys.com/?page=dcf</loc>
-  </url>
-
-</urlset>""")
-    st.stop()
-# ===== ここまで =====
-
-
-# ここから元のコード
-...
 # 他の st.* より先に必須（違反するとフロントが白画面・接続失敗になり得る）
 st.set_page_config(
     page_title="ライブラリーズ | Libralys",
@@ -82,7 +65,6 @@ import pandas as pd
 import os
 import base64
 from urllib.parse import quote
-from pathlib import Path
 from textwrap import dedent
 
 import streamlit.components.v1 as components
@@ -931,7 +913,7 @@ TEXTS["en"].update(
 )
 
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = _APP_ROOT
 # サイドバーは「PAGES に含まれるページ名文字列」だけを session に保持する（キーは _lib_nav_route）。
 # 旧実装の nav_page / _lib_nav_page_idx は起動時に統合して削除し、二重状態による空ページを防ぐ。
 NAV_PENDING_KEY = "_lib_nav_pending"
@@ -3167,8 +3149,24 @@ def _scroll_app_view_to_top() -> None:
     )
 
 
+def _standalone_hero_background_css_url() -> str:
+    """TOP ヒーロー専用。ローカル `image/ai_realestate_bg.jpg` が無いときは HTTPS 画像にフォールバック。"""
+    try:
+        bg_b64 = get_hero_background_b64_for_css() or get_base64_image("image/ai_realestate_bg.jpg")
+    except Exception:
+        bg_b64 = ""
+    if bg_b64:
+        mime = _mime_from_image_b64(bg_b64)
+        inner = bg_b64.replace("\\", "\\\\").replace("'", "\\'")
+        return f"url('data:{mime};base64,{inner}')"
+    return (
+        "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e"
+        "?auto=format&fit=crop&w=1920&q=80')"
+    )
+
+
 def render_top_hero() -> None:
-    """TOP用ヒーロー（フル幅背景・暗オーバーレイ・2段見出し・大型2CTA・スクロール誘導）。"""
+    """TOP ヒーロー（本関数＋TEXTS のみで完結。背景・オーバーレイ・2CTA・スクロール誘導を同梱）。"""
     _hl = _lang()
     _nav_mekiki = quote("価格の目利き", safe="")
     _nav_services = quote("業務内容", safe="")
@@ -3177,21 +3175,44 @@ def render_top_hero() -> None:
         for line in t("hero_product_headline").strip().splitlines()
         if line.strip()
     )
+    _bg = _standalone_hero_background_css_url()
     st.markdown(
         dedent(
             f"""
             <style>
-            .hero-visual.hero-visual--fullvp.hero-visual--product::before {{
-              border-radius: 0 !important;
-              z-index: 1 !important;
-              background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%) !important;
-            }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-inner.hero-inner--product {{
+            .lib-sh-root {{
               position: relative;
-              z-index: 2;
+              width: 100vw;
+              max-width: 100vw;
+              margin-left: calc(50% - 50vw);
+              margin-right: calc(50% - 50vw);
+              margin-top: -2rem;
+              margin-bottom: 1.25rem;
               box-sizing: border-box;
-              min-height: 100vh;
-              min-height: 100dvh;
+              min-height: 88vh;
+              min-height: 88dvh;
+              background-color: #0b1628;
+              background-image: var(--lib-sh-bg);
+              background-size: cover;
+              background-position: center center;
+              background-repeat: no-repeat;
+              font-family:
+                "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo,
+                "Noto Sans JP", system-ui, sans-serif;
+            }}
+            .lib-sh-root::before {{
+              content: "";
+              position: absolute;
+              inset: 0;
+              z-index: 0;
+              pointer-events: none;
+              background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%);
+            }}
+            .lib-sh-inner {{
+              position: relative;
+              z-index: 1;
+              box-sizing: border-box;
+              min-height: inherit;
               width: 100%;
               padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(72px, 10vh, 120px);
               display: flex;
@@ -3199,9 +3220,7 @@ def render_top_hero() -> None:
               align-items: center;
               justify-content: center;
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-card {{
-              position: relative;
-              z-index: 1;
+            .lib-sh-card {{
               width: 100%;
               max-width: 1100px;
               margin: 0 auto;
@@ -3218,7 +3237,7 @@ def render_top_hero() -> None:
               -webkit-font-smoothing: antialiased;
             }}
             @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {{
-              .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-card {{
+              .lib-sh-card {{
                 background: linear-gradient(
                   155deg,
                   rgba(15, 28, 46, 0.5) 0%,
@@ -3229,7 +3248,7 @@ def render_top_hero() -> None:
                 backdrop-filter: blur(14px) saturate(1.1);
               }}
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-kicker {{
+            .lib-sh-kicker {{
               margin: 0 0 12px 0;
               font-size: clamp(0.75rem, 1.6vw, 0.95rem);
               font-weight: 700;
@@ -3238,7 +3257,7 @@ def render_top_hero() -> None:
               color: rgba(255, 255, 255, 0.82);
               font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-title {{
+            .lib-sh-title {{
               margin: 0 0 clamp(1.25rem, 3vw, 1.75rem) 0;
               font-size: clamp(1.85rem, 5vw, 3rem);
               font-weight: 800;
@@ -3247,7 +3266,7 @@ def render_top_hero() -> None:
               color: #fff;
               text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-buttons {{
+            .lib-sh-buttons {{
               display: flex;
               flex-wrap: wrap;
               gap: 16px;
@@ -3255,7 +3274,7 @@ def render_top_hero() -> None:
               align-items: center;
               margin-top: 8px;
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn {{
+            .lib-sh-btn {{
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -3267,63 +3286,54 @@ def render_top_hero() -> None:
               font-weight: 700;
               text-decoration: none;
               cursor: pointer;
-              transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--primary {{
+            .lib-sh-btn--primary {{
               color: #fff;
               background: #43a047;
               border: 1px solid rgba(255, 255, 255, 0.12);
               box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--primary:hover {{
-              background: #4caf50;
-              box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
-            }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--secondary {{
+            .lib-sh-btn--primary:hover {{ background: #4caf50; }}
+            .lib-sh-btn--secondary {{
               color: #fff;
               background: rgba(255, 255, 255, 0.06);
               border: 2px solid rgba(255, 255, 255, 0.9);
               box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
             }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--secondary:hover {{
-              background: rgba(255, 255, 255, 0.12);
-            }}
-            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-scroll {{
+            .lib-sh-btn--secondary:hover {{ background: rgba(255, 255, 255, 0.12); }}
+            .lib-sh-scroll {{
               position: absolute;
               left: 50%;
               bottom: clamp(16px, 3vh, 28px);
               transform: translateX(-50%);
-              z-index: 3;
+              z-index: 2;
               font-size: 0.875rem;
               font-weight: 600;
               letter-spacing: 0.08em;
               color: rgba(255, 255, 255, 0.88);
               text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-              animation: lib-hero-scroll-bounce 2s ease-in-out infinite;
+              animation: lib-sh-scroll-bounce 2s ease-in-out infinite;
               pointer-events: none;
             }}
-            @keyframes lib-hero-scroll-bounce {{
+            @keyframes lib-sh-scroll-bounce {{
               0%, 100% {{ transform: translate(-50%, 0); }}
               50% {{ transform: translate(-50%, 10px); }}
             }}
             @media (prefers-reduced-motion: reduce) {{
-              .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-scroll {{
-                animation: none !important;
-              }}
+              .lib-sh-scroll {{ animation: none !important; }}
             }}
             </style>
-            <div class="hero-visual hero-visual--fullvp hero-visual--product" lang="{html.escape(_hl, quote=True)}">
-            <div class="hero-visual__bg" aria-hidden="true"></div>
-            <div class="hero-inner hero-inner--product">
-            <div class="hero-pro-card">
-            <p class="hero-pro-kicker">{html.escape(t("hero_product_kicker"), quote=True)}</p>
-            <div class="hero-pro-title">{_head_html}</div>
-            <div class="hero-pro-buttons">
-            <a class="hero-pro-btn hero-pro-btn--primary" href="?nav={_nav_mekiki}">{html.escape(t("hero_cta_primary"), quote=True)}</a>
-            <a class="hero-pro-btn hero-pro-btn--secondary" href="?nav={_nav_services}">{html.escape(t("hero_cta_secondary"), quote=True)}</a>
+            <div class="lib-sh-root" lang="{html.escape(_hl, quote=True)}" style="--lib-sh-bg: {_bg};">
+            <div class="lib-sh-inner">
+            <div class="lib-sh-card">
+            <p class="lib-sh-kicker">{html.escape(t("hero_product_kicker"), quote=True)}</p>
+            <div class="lib-sh-title">{_head_html}</div>
+            <div class="lib-sh-buttons">
+            <a class="lib-sh-btn lib-sh-btn--primary" href="?nav={_nav_mekiki}">{html.escape(t("hero_cta_primary"), quote=True)}</a>
+            <a class="lib-sh-btn lib-sh-btn--secondary" href="?nav={_nav_services}">{html.escape(t("hero_cta_secondary"), quote=True)}</a>
             </div>
             </div>
-            <div class="hero-pro-scroll" aria-hidden="true">{html.escape(t("hero_scroll_hint"), quote=True)}</div>
+            <div class="lib-sh-scroll" aria-hidden="true">{html.escape(t("hero_scroll_hint"), quote=True)}</div>
             </div>
             </div>
             """
