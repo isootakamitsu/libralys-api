@@ -3342,6 +3342,99 @@ def render_top_hero() -> None:
     )
 
 
+def render_top_service_cards_section() -> None:
+    """TOP: Hero 直下のサービスカード（3列／モバイル1列・?nav 短リンク）。"""
+    _nav_mekiki = quote("価格の目利き", safe="")
+    _nav_dcf = "DCF"
+    _nav_appraisal = quote("鑑定評価", safe="")
+    _t1 = html.escape("価格の目利き", quote=True)
+    _d1 = html.escape("AIで不動産価格を即時診断", quote=True)
+    _t2 = html.escape("DCF分析", quote=True)
+    _d2 = html.escape("収益還元法による詳細分析", quote=True)
+    _t3 = html.escape("不動産鑑定", quote=True)
+    _d3 = html.escape("専門鑑定士による評価", quote=True)
+    _h = html.escape("提供サービス", quote=True)
+    st.markdown(
+        dedent(
+            f"""
+            <style>
+            .lib-top-svc-wrap {{
+              max-width: 1100px;
+              margin: 0 auto;
+              padding: 8px 16px 0;
+              box-sizing: border-box;
+            }}
+            .lib-top-svc-heading {{
+              text-align: center;
+              font-size: 1.75rem;
+              font-weight: 800;
+              color: #0F1C2E;
+              margin: 0 0 8px 0;
+              letter-spacing: 0.02em;
+            }}
+            .lib-top-svc-cards {{
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 24px;
+              margin-top: 40px;
+            }}
+            .lib-top-svc-card {{
+              background: white;
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+              transition: transform 0.3s ease, box-shadow 0.3s ease;
+              display: block;
+              text-decoration: none;
+              color: #111827;
+              box-sizing: border-box;
+            }}
+            .lib-top-svc-card:hover {{
+              transform: translateY(-5px);
+              box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+            }}
+            .lib-top-svc-card-title {{
+              font-size: 20px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #0F1C2E;
+            }}
+            .lib-top-svc-card-desc {{
+              font-size: 14px;
+              color: #555;
+              line-height: 1.6;
+            }}
+            @media (max-width: 768px) {{
+              .lib-top-svc-cards {{ grid-template-columns: 1fr; }}
+            }}
+            @media (prefers-reduced-motion: reduce) {{
+              .lib-top-svc-card {{ transition: none; }}
+              .lib-top-svc-card:hover {{ transform: none; }}
+            }}
+            </style>
+            <div class="lib-top-svc-wrap">
+            <h2 class="lib-top-svc-heading">{_h}</h2>
+            <div class="lib-top-svc-cards">
+            <a href="?nav={_nav_mekiki}" class="lib-top-svc-card">
+            <div class="lib-top-svc-card-title">{_t1}</div>
+            <div class="lib-top-svc-card-desc">{_d1}</div>
+            </a>
+            <a href="?nav={_nav_dcf}" class="lib-top-svc-card">
+            <div class="lib-top-svc-card-title">{_t2}</div>
+            <div class="lib-top-svc-card-desc">{_d2}</div>
+            </a>
+            <a href="?nav={_nav_appraisal}" class="lib-top-svc-card">
+            <div class="lib-top-svc-card-title">{_t3}</div>
+            <div class="lib-top-svc-card-desc">{_d3}</div>
+            </a>
+            </div>
+            </div>
+            """
+        ).strip(),
+        unsafe_allow_html=True,
+    )
+
+
 def info_kpis():
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -4111,6 +4204,9 @@ _nav_qp = st.query_params.get("nav")
 if _nav_qp is not None:
     _raw = _nav_qp[0] if isinstance(_nav_qp, list) else _nav_qp
     _nav_val = _raw.strip() if isinstance(_raw, str) else ""
+    # TOP サービスカード等の短リンク → 既存ページキーへ正規化
+    _nav_aliases = {"DCF": "AI分析ツール", "鑑定評価": "業務内容"}
+    _nav_val = _nav_aliases.get(_nav_val, _nav_val)
     _nav_removed = False
     try:
         if "nav" in st.query_params:
@@ -4268,8 +4364,9 @@ section[data-testid="stMain"] .block-container .hr {
     )
     # 先頭スクロールは inject_scroll_to_top_script()（ヘッダー直後）で全ページ共通処理済み
 
-    # TOP：ヒーロー → NEWS（注目1件カード常時表示／通常はexpander・件数表示／アーカイブは月別・初期閉）→ カードナビ
+    # TOP：ヒーロー → サービスカード → NEWS（注目1件カード常時表示／通常はexpander・件数表示／アーカイブは月別・初期閉）→ カードナビ
     render_top_hero()
+    render_top_service_cards_section()
     hr()
     render_news_split_tanizawa_style(
         base_dir=BASE_DIR,
