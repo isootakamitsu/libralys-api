@@ -3,11 +3,20 @@
 # ============================================================
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 from libralys_app.routes_ui import router as ui_router
 
 app = FastAPI()
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://libralys.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/texts")
@@ -25,15 +34,6 @@ async def get_ui_top(lang: str = "ja"):
         "data": {},
     }
 
-
-# ---------------- CORS ----------------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 開発用：全許可
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # ---------------- Router ----------------
 app.include_router(ui_router)
