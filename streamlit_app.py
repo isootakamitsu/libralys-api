@@ -119,11 +119,6 @@ from lib.top_corporate import (
     render_corporate_section_title,
 )
 from lib.breadcrumbs import SCROLL_TOP_ONCE_KEY, render_site_breadcrumbs
-from lib.top_nav_cards import (
-    grouped_default_top_nav_specs,
-    inject_top_nav_card_css,
-    render_top_nav_card_groups,
-)
 # 不動産トレンド情報（信頼ソース・スコアリング・将来の fetch/要約API 拡張は lib/real_estate_trends.py）
 from lib.real_estate_trends import render_real_estate_trends_section
 # ⑨ カード：新規タブで開く案内ページ（→ 地図は `pages/chika_pydeck_dashboard.py`）
@@ -147,7 +142,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "lang_en": "English",
         "breadcrumb_home": "ホーム",
         "breadcrumb_back_help": "トップ（ホーム）へ",
-        "footer_line": "© {company}｜説明責任と再現性を重視した不動産コンサルティング",
+        "footer_line": "© {company}｜説明責任と再現性を重視した専門サービス",
         "footer_translation_note": "英語表示は海外の投資家・専門家向けの参考として提供しています。用語・概念の整理には国際評価基準（IVS）、RICS Valuation – Global Standards（いわゆる Red Book）、USPAP 等も参照しますが、当該諸基準や各国の法令・実務上の要請を代替・満たすものではありません。",
         "news_section_mast": "NEWS",
         "news_section_kicker": "最新情報",
@@ -180,7 +175,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "nav_はじめての方へ": "はじめての方へ",
         "nav_業務内容": "業務内容",
         "nav_業務の流れ": "業務の流れ",
-        "nav_AI分析ツール": "AI分析ツール",
+        "nav_AI分析ツール": "データ分析・ツール",
         "nav_AI評価研究グループ": "AI評価研究グループ",
         "nav_価格の目利き": "価格の目利き",
         "nav_不動産鑑定士マッチング": "不動産鑑定士マッチング",
@@ -207,15 +202,22 @@ AIを活用した高度な分析により、根拠ある価格説明を提供し
         "hero_cta_primary": "無料で試す",
         "hero_cta_secondary": "詳細を見る",
         "hero_scroll_hint": "↓スクロール",
+        "top_service_section_title": "提供サービス",
+        "top_svc_card1_title": "価格の目利き",
+        "top_svc_card1_desc": "AIで不動産価格を即時診断",
+        "top_svc_card2_title": "DCF分析",
+        "top_svc_card2_desc": "収益還元法による詳細分析",
+        "top_svc_card3_title": "不動産鑑定",
+        "top_svc_card3_desc": "専門鑑定士による評価",
         "top_cta_services": "業務内容を見る",
-        "top_cta_ai": "AI分析ツールを見る",
+        "top_cta_ai": "分析ツールを見る",
         "m_kpi_office": "拠点",
         "m_kpi_office_v": "大阪",
         "m_kpi_cov": "対応",
         "m_kpi_cov_v": "全国対応",
         "m_kpi_exp": "代表の実務経験",
         "m_kpi_exp_v": "40年",
-        "m_kpi_cases": "代表の鑑定評価件数",
+        "m_kpi_cases": "代表の実務件数",
         "m_kpi_cases_v": "実績2,000件以上",
         "exp_philosophy": "PHILOSOPHY",
         "about_title": "ライブラリーズとは",
@@ -292,7 +294,7 @@ AIを活用した高度な分析により、根拠ある価格説明を提供し
         "lang_en": "English",
         "breadcrumb_home": "Home",
         "breadcrumb_back_help": "Back to home",
-        "footer_line": "© {company}｜Real Estate Consulting focused on accountability and reproducibility",
+        "footer_line": "© {company}｜Professional services focused on accountability and reproducibility",
         "footer_translation_note": "English pages are provided for international readers. Terminology is informed, where appropriate, by the *International Valuation Standards (IVS)*, the *RICS Valuation – Global Standards* (“Red Book”, UK), and the *Uniform Standards of Professional Appraisal Practice (USPAP)* (US). This does not replace those publications or satisfy any specific foreign regulatory or professional requirements.",
         "news_section_mast": "NEWS",
         "news_section_kicker": "Updates",
@@ -325,7 +327,7 @@ AIを活用した高度な分析により、根拠ある価格説明を提供し
         "nav_はじめての方へ": "First visit",
         "nav_業務内容": "Services",
         "nav_業務の流れ": "How we work",
-        "nav_AI分析ツール": "AI analytics tools",
+        "nav_AI分析ツール": "Data analytics & tools",
         "nav_AI評価研究グループ": "AI valuation research",
         "nav_価格の目利き": "Price Insight",
         "nav_不動産鑑定士マッチング": "Appraiser matching",
@@ -351,15 +353,22 @@ into an era where they can be explained""",
         "hero_cta_primary": "Try it free",
         "hero_cta_secondary": "See details",
         "hero_scroll_hint": "↓ Scroll",
+        "top_service_section_title": "Services",
+        "top_svc_card1_title": "Price Insight",
+        "top_svc_card1_desc": "Instant property price diagnostics with AI",
+        "top_svc_card2_title": "DCF analysis",
+        "top_svc_card2_desc": "Income approach–based detailed analysis",
+        "top_svc_card3_title": "Real estate appraisal",
+        "top_svc_card3_desc": "Professional appraiser–led evaluation",
         "top_cta_services": "Explore services",
-        "top_cta_ai": "Explore AI tools",
+        "top_cta_ai": "View analytics tools",
         "m_kpi_office": "Office",
         "m_kpi_office_v": "Osaka",
         "m_kpi_cov": "Coverage",
         "m_kpi_cov_v": "Japan-wide (planned)",
         "m_kpi_exp": "Representative’s experience",
         "m_kpi_exp_v": "40 years",
-        "m_kpi_cases": "Representative’s appraisal volume",
+        "m_kpi_cases": "Representative engagements",
         "m_kpi_cases_v": "2,000+ assignments",
         "exp_philosophy": "PHILOSOPHY",
         "about_title": "About Libralys",
@@ -838,17 +847,35 @@ def _lang() -> str:
 
 
 def t(key: str) -> str:
+    """TEXTS 参照。欠損時は日本語↔英語でフォールバックし、未解決は空（キー名や None を UI に出さない）。"""
+    if key is None:
+        return ""
+    k = str(key).strip()
+    if not k:
+        return ""
     lang = _lang()
     ja = TEXTS["ja"]
     en = TEXTS["en"]
     if lang == "ja":
-        return ja.get(key, key)
-    return en.get(key) or ja.get(key, key)
+        v = ja.get(k)
+        if v is not None and str(v).strip() != "":
+            return str(v)
+        v_en = en.get(k)
+        if v_en is not None and str(v_en).strip() != "":
+            return str(v_en)
+        return ""
+    v_en = en.get(k)
+    if v_en is not None and str(v_en).strip() != "":
+        return str(v_en)
+    v_ja = ja.get(k)
+    if v_ja is not None and str(v_ja).strip() != "":
+        return str(v_ja)
+    return ""
 
 
 def page_display_label(page_key: str) -> str:
     k = f"nav_{page_key}"
-    return t(k)
+    return t(k) or str(page_key or "")
 
 
 def breadcrumb_group_label(ja_group: str) -> str:
@@ -3065,25 +3092,6 @@ Volume alone does not define expertise—but breadth reduces blind spots and wid
     )
 
 
-def localized_top_nav_groups():
-    """TOP ナビカード群：英語 UI ではグループ見出しとカードタイトル（=ページ表示名）を言語に合わせる。"""
-    from dataclasses import replace
-
-    groups = grouped_default_top_nav_specs()
-    if _lang() == "ja":
-        return groups
-    gm = {
-        "企業・ご案内": "group_nav_corp",
-        "サービス・実績": "group_nav_svc",
-        "AI・ツール・研究": "group_nav_ai",
-    }
-    out: List[Tuple[str, List[Any]]] = []
-    for lab, specs in groups:
-        ns = [replace(s, title=page_display_label(s.target_page)) for s in specs]
-        out.append((t(gm[lab]), ns))
-    return out
-
-
 def localized_ai_projects_for_catalog() -> List[Dict[str, Any]]:
     raw = get_resolved_ai_projects_for_catalog()
     if _lang() == "ja":
@@ -3092,11 +3100,11 @@ def localized_ai_projects_for_catalog() -> List[Dict[str, Any]]:
     for proj in raw:
         slug = str(proj.get("key_slug") or "")
         d = dict(proj)
-        d["name"] = t(f"ai_{slug}_name")
-        d["tagline"] = t(f"ai_{slug}_tag")
-        d["summary"] = t(f"ai_{slug}_sum")
+        d["name"] = t(f"ai_{slug}_name") or str(proj.get("name") or "")
+        d["tagline"] = t(f"ai_{slug}_tag") or str(proj.get("tagline") or "")
+        d["summary"] = t(f"ai_{slug}_sum") or str(proj.get("summary") or "")
         if proj.get("notes"):
-            d["notes"] = t(f"ai_{slug}_note")
+            d["notes"] = t(f"ai_{slug}_note") or str(proj.get("notes") or "")
         merged.append(d)
     return merged
 
@@ -3149,6 +3157,226 @@ def _scroll_app_view_to_top() -> None:
     )
 
 
+def _top_immersive_css_block() -> str:
+    """TOP 専用 CSS（Hero・サービスカード・埋め込みラッパー）。Markdown 断片内の style が欠落し得るためページ先頭の style に集約する。"""
+    return (
+        """
+.lib-sh-root {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: -2rem;
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+  min-height: 88vh;
+  min-height: 88dvh;
+  background-color: #0b1628;
+  background-image: var(--lib-sh-bg);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  font-family:
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo,
+    "Noto Sans JP", system-ui, sans-serif;
+  display: block;
+}
+.lib-sh-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%);
+}
+.lib-sh-inner {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  min-height: inherit;
+  width: 100%;
+  padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(72px, 10vh, 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.lib-sh-card {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  color: #fff;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem) clamp(1.25rem, 3vw, 2.25rem);
+  border-radius: 20px;
+  border: 1px solid rgba(201, 162, 77, 0.28);
+  background: rgba(15, 28, 46, 0.55);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  -webkit-font-smoothing: antialiased;
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .lib-sh-card {
+    background: linear-gradient(
+      155deg,
+      rgba(15, 28, 46, 0.5) 0%,
+      rgba(15, 28, 46, 0.36) 55%,
+      rgba(24, 40, 62, 0.42) 100%
+    );
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    backdrop-filter: blur(14px) saturate(1.1);
+  }
+}
+.lib-sh-kicker {
+  margin: 0 0 12px 0;
+  font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.lib-sh-title {
+  margin: 0 0 clamp(1.25rem, 3vw, 1.75rem) 0;
+  font-size: clamp(1.85rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.28;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
+}
+.lib-sh-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+.lib-sh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 0 clamp(1.5rem, 4vw, 2.25rem);
+  border-radius: 12px;
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.lib-sh-btn--primary {
+  color: #fff;
+  background: #43a047;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+}
+.lib-sh-btn--primary:hover { background: #4caf50; }
+.lib-sh-btn--secondary {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.lib-sh-btn--secondary:hover { background: rgba(255, 255, 255, 0.12); }
+.lib-sh-scroll {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(16px, 3vh, 28px);
+  transform: translateX(-50%);
+  z-index: 2;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  animation: lib-sh-scroll-bounce 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes lib-sh-scroll-bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lib-sh-scroll { animation: none !important; }
+}
+.lib-top-svc-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 8px 16px 0;
+  box-sizing: border-box;
+}
+.lib-top-svc-heading {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0F1C2E;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.02em;
+}
+.lib-top-svc-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.lib-top-svc-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: block;
+  text-decoration: none;
+  color: #111827;
+  box-sizing: border-box;
+}
+.lib-top-svc-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+}
+.lib-top-svc-card-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #0F1C2E;
+}
+.lib-top-svc-card-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .lib-top-svc-cards { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lib-top-svc-card { transition: none; }
+  .lib-top-svc-card:hover { transform: none; }
+}
+[data-testid="stMarkdownContainer"] .lib-top-html-embed {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+[data-testid="stMarkdownContainer"] .lib-top-html-embed p {
+  margin: 0 !important;
+}
+section[data-testid="stMain"] [data-testid="stMarkdownContainer"]:has(.lib-top-html-embed) {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+section[data-testid="stMain"] [data-testid="stMarkdownContainer"]:has(.lib-top-html-embed) p {
+  margin: 0 !important;
+}
+"""
+    ).strip()
+
+
 def _standalone_hero_background_css_url() -> str:
     """TOP ヒーロー専用。ローカル `image/ai_realestate_bg.jpg` が無いときは HTTPS 画像にフォールバック。"""
     try:
@@ -3166,163 +3394,22 @@ def _standalone_hero_background_css_url() -> str:
 
 
 def render_top_hero() -> None:
-    """TOP ヒーロー（本関数＋TEXTS のみで完結。背景・オーバーレイ・2CTA・スクロール誘導を同梱）。"""
+    """TOP ヒーロー（HTML のみ。見た目用 CSS は `page == \"TOP\"` 先頭の style に `_top_immersive_css_block()` で集約）。"""
     _hl = _lang()
     _nav_mekiki = quote("価格の目利き", safe="")
     _nav_services = quote("業務内容", safe="")
-    _head_html = "<br>".join(
-        html.escape(line.strip(), quote=True)
-        for line in t("hero_product_headline").strip().splitlines()
-        if line.strip()
+    _hl_raw = (t("hero_product_headline") or "").strip()
+    _hl_lines = [ln.strip() for ln in _hl_raw.splitlines() if ln.strip()]
+    _head_html = (
+        "<br>".join(html.escape(ln, quote=True) for ln in _hl_lines)
+        if _hl_lines
+        else html.escape(_hl_raw or t("hero_headline"), quote=True)
     )
     _bg = _standalone_hero_background_css_url()
     st.markdown(
-        dedent(
+        '<div class="lib-top-html-embed">'
+        + dedent(
             f"""
-            <style>
-            .lib-sh-root {{
-              position: relative;
-              width: 100vw;
-              max-width: 100vw;
-              margin-left: calc(50% - 50vw);
-              margin-right: calc(50% - 50vw);
-              margin-top: -2rem;
-              margin-bottom: 1.25rem;
-              box-sizing: border-box;
-              min-height: 88vh;
-              min-height: 88dvh;
-              background-color: #0b1628;
-              background-image: var(--lib-sh-bg);
-              background-size: cover;
-              background-position: center center;
-              background-repeat: no-repeat;
-              font-family:
-                "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo,
-                "Noto Sans JP", system-ui, sans-serif;
-            }}
-            .lib-sh-root::before {{
-              content: "";
-              position: absolute;
-              inset: 0;
-              z-index: 0;
-              pointer-events: none;
-              background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%);
-            }}
-            .lib-sh-inner {{
-              position: relative;
-              z-index: 1;
-              box-sizing: border-box;
-              min-height: inherit;
-              width: 100%;
-              padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(72px, 10vh, 120px);
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-            }}
-            .lib-sh-card {{
-              width: 100%;
-              max-width: 1100px;
-              margin: 0 auto;
-              text-align: center;
-              color: #fff;
-              padding: clamp(1.5rem, 3.5vw, 2.5rem) clamp(1.25rem, 3vw, 2.25rem);
-              border-radius: 20px;
-              border: 1px solid rgba(201, 162, 77, 0.28);
-              background: rgba(15, 28, 46, 0.55);
-              box-shadow:
-                0 28px 64px rgba(0, 0, 0, 0.45),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-                0 1px 0 rgba(255, 255, 255, 0.08) inset;
-              -webkit-font-smoothing: antialiased;
-            }}
-            @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {{
-              .lib-sh-card {{
-                background: linear-gradient(
-                  155deg,
-                  rgba(15, 28, 46, 0.5) 0%,
-                  rgba(15, 28, 46, 0.36) 55%,
-                  rgba(24, 40, 62, 0.42) 100%
-                );
-                -webkit-backdrop-filter: blur(14px) saturate(1.1);
-                backdrop-filter: blur(14px) saturate(1.1);
-              }}
-            }}
-            .lib-sh-kicker {{
-              margin: 0 0 12px 0;
-              font-size: clamp(0.75rem, 1.6vw, 0.95rem);
-              font-weight: 700;
-              letter-spacing: 0.12em;
-              text-transform: uppercase;
-              color: rgba(255, 255, 255, 0.82);
-              font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-            }}
-            .lib-sh-title {{
-              margin: 0 0 clamp(1.25rem, 3vw, 1.75rem) 0;
-              font-size: clamp(1.85rem, 5vw, 3rem);
-              font-weight: 800;
-              line-height: 1.28;
-              letter-spacing: 0.02em;
-              color: #fff;
-              text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
-            }}
-            .lib-sh-buttons {{
-              display: flex;
-              flex-wrap: wrap;
-              gap: 16px;
-              justify-content: center;
-              align-items: center;
-              margin-top: 8px;
-            }}
-            .lib-sh-btn {{
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              box-sizing: border-box;
-              min-height: 60px;
-              padding: 0 clamp(1.5rem, 4vw, 2.25rem);
-              border-radius: 12px;
-              font-size: clamp(1rem, 2.2vw, 1.125rem);
-              font-weight: 700;
-              text-decoration: none;
-              cursor: pointer;
-            }}
-            .lib-sh-btn--primary {{
-              color: #fff;
-              background: #43a047;
-              border: 1px solid rgba(255, 255, 255, 0.12);
-              box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
-            }}
-            .lib-sh-btn--primary:hover {{ background: #4caf50; }}
-            .lib-sh-btn--secondary {{
-              color: #fff;
-              background: rgba(255, 255, 255, 0.06);
-              border: 2px solid rgba(255, 255, 255, 0.9);
-              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            }}
-            .lib-sh-btn--secondary:hover {{ background: rgba(255, 255, 255, 0.12); }}
-            .lib-sh-scroll {{
-              position: absolute;
-              left: 50%;
-              bottom: clamp(16px, 3vh, 28px);
-              transform: translateX(-50%);
-              z-index: 2;
-              font-size: 0.875rem;
-              font-weight: 600;
-              letter-spacing: 0.08em;
-              color: rgba(255, 255, 255, 0.88);
-              text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-              animation: lib-sh-scroll-bounce 2s ease-in-out infinite;
-              pointer-events: none;
-            }}
-            @keyframes lib-sh-scroll-bounce {{
-              0%, 100% {{ transform: translate(-50%, 0); }}
-              50% {{ transform: translate(-50%, 10px); }}
-            }}
-            @media (prefers-reduced-motion: reduce) {{
-              .lib-sh-scroll {{ animation: none !important; }}
-            }}
-            </style>
             <div class="lib-sh-root" lang="{html.escape(_hl, quote=True)}" style="--lib-sh-bg: {_bg};">
             <div class="lib-sh-inner">
             <div class="lib-sh-card">
@@ -3337,7 +3424,8 @@ def render_top_hero() -> None:
             </div>
             </div>
             """
-        ).strip(),
+        ).strip()
+        + "</div>",
         unsafe_allow_html=True,
     )
 
@@ -3346,72 +3434,18 @@ def render_top_service_cards_section() -> None:
     """TOP: Hero 直下のサービスカード（3列／モバイル1列・?nav 短リンク）。"""
     _nav_mekiki = quote("価格の目利き", safe="")
     _nav_dcf = "DCF"
-    _nav_appraisal = quote("鑑定評価", safe="")
-    _t1 = html.escape("価格の目利き", quote=True)
-    _d1 = html.escape("AIで不動産価格を即時診断", quote=True)
-    _t2 = html.escape("DCF分析", quote=True)
-    _d2 = html.escape("収益還元法による詳細分析", quote=True)
-    _t3 = html.escape("不動産鑑定", quote=True)
-    _d3 = html.escape("専門鑑定士による評価", quote=True)
-    _h = html.escape("提供サービス", quote=True)
+    _nav_business = quote("業務内容", safe="")
+    _t1 = html.escape(t("top_svc_card1_title"), quote=True)
+    _d1 = html.escape(t("top_svc_card1_desc"), quote=True)
+    _t2 = html.escape(t("top_svc_card2_title"), quote=True)
+    _d2 = html.escape(t("top_svc_card2_desc"), quote=True)
+    _t3 = html.escape(t("top_svc_card3_title"), quote=True)
+    _d3 = html.escape(t("top_svc_card3_desc"), quote=True)
+    _h = html.escape(t("top_service_section_title"), quote=True)
     st.markdown(
-        dedent(
+        '<div class="lib-top-html-embed">'
+        + dedent(
             f"""
-            <style>
-            .lib-top-svc-wrap {{
-              max-width: 1100px;
-              margin: 0 auto;
-              padding: 8px 16px 0;
-              box-sizing: border-box;
-            }}
-            .lib-top-svc-heading {{
-              text-align: center;
-              font-size: 1.75rem;
-              font-weight: 800;
-              color: #0F1C2E;
-              margin: 0 0 8px 0;
-              letter-spacing: 0.02em;
-            }}
-            .lib-top-svc-cards {{
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 24px;
-              margin-top: 40px;
-            }}
-            .lib-top-svc-card {{
-              background: white;
-              padding: 24px;
-              border-radius: 12px;
-              box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-              transition: transform 0.3s ease, box-shadow 0.3s ease;
-              display: block;
-              text-decoration: none;
-              color: #111827;
-              box-sizing: border-box;
-            }}
-            .lib-top-svc-card:hover {{
-              transform: translateY(-5px);
-              box-shadow: 0 14px 32px rgba(0,0,0,0.12);
-            }}
-            .lib-top-svc-card-title {{
-              font-size: 20px;
-              font-weight: bold;
-              margin-bottom: 10px;
-              color: #0F1C2E;
-            }}
-            .lib-top-svc-card-desc {{
-              font-size: 14px;
-              color: #555;
-              line-height: 1.6;
-            }}
-            @media (max-width: 768px) {{
-              .lib-top-svc-cards {{ grid-template-columns: 1fr; }}
-            }}
-            @media (prefers-reduced-motion: reduce) {{
-              .lib-top-svc-card {{ transition: none; }}
-              .lib-top-svc-card:hover {{ transform: none; }}
-            }}
-            </style>
             <div class="lib-top-svc-wrap">
             <h2 class="lib-top-svc-heading">{_h}</h2>
             <div class="lib-top-svc-cards">
@@ -3423,14 +3457,15 @@ def render_top_service_cards_section() -> None:
             <div class="lib-top-svc-card-title">{_t2}</div>
             <div class="lib-top-svc-card-desc">{_d2}</div>
             </a>
-            <a href="?nav={_nav_appraisal}" class="lib-top-svc-card">
+            <a href="?nav={_nav_business}" class="lib-top-svc-card">
             <div class="lib-top-svc-card-title">{_t3}</div>
             <div class="lib-top-svc-card-desc">{_d3}</div>
             </a>
             </div>
             </div>
             """
-        ).strip(),
+        ).strip()
+        + "</div>",
         unsafe_allow_html=True,
     )
 
@@ -4205,7 +4240,7 @@ if _nav_qp is not None:
     _raw = _nav_qp[0] if isinstance(_nav_qp, list) else _nav_qp
     _nav_val = _raw.strip() if isinstance(_raw, str) else ""
     # TOP サービスカード等の短リンク → 既存ページキーへ正規化
-    _nav_aliases = {"DCF": "AI分析ツール", "鑑定評価": "業務内容"}
+    _nav_aliases = {"DCF": "AI分析ツール"}
     _nav_val = _nav_aliases.get(_nav_val, _nav_val)
     _nav_removed = False
     try:
@@ -4358,13 +4393,16 @@ section[data-testid="stMain"] .block-container .hr {
   margin: 1.35rem 0 1.6rem 0 !important;
   opacity: 0.85;
 }
+"""
+        + _top_immersive_css_block()
+        + """
 </style>
 """,
         unsafe_allow_html=True,
     )
     # 先頭スクロールは inject_scroll_to_top_script()（ヘッダー直後）で全ページ共通処理済み
 
-    # TOP：ヒーロー → サービスカード → NEWS（注目1件カード常時表示／通常はexpander・件数表示／アーカイブは月別・初期閉）→ カードナビ
+    # TOP：ヒーロー → サービスカード → NEWS → トレンド → 以降（旧・大型ナビカード群は撤去して UI 一本化）
     render_top_hero()
     render_top_service_cards_section()
     hr()
@@ -4395,18 +4433,6 @@ section[data-testid="stMain"] .block-container .hr {
         t=t,
         lang=_lang(),
         render_section_title=render_corporate_section_title,
-    )
-    hr()
-    render_top_nav_card_groups(
-        groups=localized_top_nav_groups(),
-        base_dir=BASE_DIR,
-        b64_loader=get_topnav_card_bg_b64,
-        css_data_url_mime="image/jpeg",
-        tile_b64_revision=_TOPNAV_TILE_CACHE_VER,
-        valid_pages=PAGES,
-        current_page=page,
-        pending_nav_key=NAV_PENDING_KEY,
-        show_group_headers=False,
     )
     hr()
 
