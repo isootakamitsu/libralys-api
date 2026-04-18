@@ -1,13 +1,8 @@
-# Streamlit 本番（Render）・ローカル共通: streamlit_app.py + lib/
-streamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-markdown>=3.4.0
-pillow>=10.0.0
-plotly>=5.18.0
-python-multipart>=0.0.6
-pydantic>=2.0.0
-
-# 同リポジトリの FastAPI バックエンド（別サービス起動時）
-fastapi>=0.100.0
-uvicorn[standard]>=0.22.0
+streamlit
+pandas
+numpy
+plotly
+pillow
+markdown
+fastapi
+uvicorn
