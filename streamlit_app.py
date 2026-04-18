@@ -3497,6 +3497,27 @@ MEKIKI_NG_WORDS_EN = [
     "do not buy",
 ]
 
+API_BASE_URL = "https://libralys-api.onrender.com"
+
+
+def _post_mekiki_run_api(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """本番 FastAPI（Render）の目利き API へ POST。接続・HTTP・JSON 異常時は None。"""
+    import requests
+
+    try:
+        response = requests.post(
+            f"{API_BASE_URL}/api/mekiki/run",
+            json=payload,
+            timeout=15,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error("API接続エラー")
+        st.text(str(e))
+        return None
+
+
 _MEKIKI_REGION_I18N = {"全国（暫定）": "reg_nat", "関西（暫定）": "reg_kansai", "首都圏（暫定）": "reg_kanto"}
 _MEKIKI_WALK_I18N = {
     "駅徒歩10分以内": "wb_10",
@@ -3873,6 +3894,29 @@ background:#fff;font-size:0.95rem;color:#1f2937;line-height:1.7;">
         run = st.button(t("mekiki_run"), type="secondary", key="mekiki_run")
 
         if run:
+            _mekiki_api_payload: Dict[str, Any] = {
+                "price_myen": float(price_myen),
+                "area_sqm": float(area_sqm),
+                "walk_min": float(walk_min),
+                "building_condition": bool(building_condition),
+                "address": str(address or ""),
+                "region": str(region),
+                "walk_bucket": str(wb),
+                "road_width_m": road_width_m,
+                "shape_risk": str(shape_risk),
+                "listing_raw": str(raw or ""),
+                "comps_raw": str(comps_raw or ""),
+                "lang": _lang(),
+            }
+            if df_comps is not None and not df_comps.empty:
+                _mekiki_api_payload["comps"] = (
+                    df_comps.astype(object).where(pd.notna(df_comps), None).to_dict(orient="records")
+                )
+            else:
+                _mekiki_api_payload["comps"] = []
+            _api_json = _post_mekiki_run_api(_mekiki_api_payload)
+            if _api_json is not None:
+                st.session_state["mekiki_api_last_ok"] = _api_json
             st.session_state["mekiki_inputs"] = {
                 "price_myen": float(price_myen),
                 "area_sqm": float(area_sqm),

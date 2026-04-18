@@ -12,10 +12,7 @@ app = FastAPI()
 # ---------------- CORS ----------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://libralys.com",
-        "https://www.libralys.com",
-    ],
+    allow_origins=["*"],  # 開発用：全許可
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
