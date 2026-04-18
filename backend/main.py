@@ -9,6 +9,23 @@ from libralys_app.routes_ui import router as ui_router
 
 app = FastAPI()
 
+
+@app.get("/api/texts")
+async def get_texts(lang: str = "ja"):
+    return {
+        "status": "ok",
+        "data": {},
+    }
+
+
+@app.get("/api/ui/top")
+async def get_ui_top(lang: str = "ja"):
+    return {
+        "status": "ok",
+        "data": {},
+    }
+
+
 # ---------------- CORS ----------------
 app.add_middleware(
     CORSMiddleware,
