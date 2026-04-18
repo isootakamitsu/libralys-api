@@ -3497,7 +3497,7 @@ MEKIKI_NG_WORDS_EN = [
     "do not buy",
 ]
 
-API_BASE_URL = "https://libralys-api.onrender.com"
+API_BASE_URL = "https://libralys-api-1.onrender.com"
 
 
 def _post_mekiki_run_api(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
