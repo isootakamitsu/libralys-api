@@ -4,7 +4,7 @@
 # ー 実績・ケーススタディ公開型 / プライバシー統合版
 # 重要：コード8の内容（文章・ページ構成・方針）を崩さず、
 #       TOPのみ「ビジュアル化Hero」を追加統合（既存TOP本文は維持）
-# 実行: streamlit run app.py
+# 実行: streamlit run streamlit_app.py（本リポジトリ＝Render 本番と同一）
 # ============================================================
 
 import streamlit as st
@@ -219,6 +219,12 @@ TEXTS: Dict[str, Dict[str, str]] = {
 AIを活用した高度な分析により、根拠ある価格説明を提供します。
 40年の実務経験と2,000件超の鑑定評価に基づき、市場データ・制度・収益性を統合分析し、第三者が検証可能な説明を提供します。""",
         "hero_foot": "不動産鑑定士｜AI鑑定|ライブラリーズ",
+        "hero_product_kicker": "AI REAL ESTATE ANALYSIS PLATFORM",
+        "hero_product_headline": """不動産価格を
+「説明できる」時代へ""",
+        "hero_cta_primary": "無料で試す",
+        "hero_cta_secondary": "詳細を見る",
+        "hero_scroll_hint": "↓スクロール",
         "top_cta_services": "業務内容を見る",
         "top_cta_ai": "AI分析ツールを見る",
         "m_kpi_office": "拠点",
@@ -357,6 +363,12 @@ income prospects, and risk factors intersect. This site integrates Real Estate A
 to organize and visualize how value is formed—so conclusions can be reviewed by third parties.
 Drawing on four decades of practice and 2,000+ appraisal assignments, we combine market data, institutional context, and income logic into transparent, verifiable explanations.""",
         "hero_foot": "Accountability · reproducibility · independence｜Analysis led by a real property appraiser",
+        "hero_product_kicker": "AI REAL ESTATE ANALYSIS PLATFORM",
+        "hero_product_headline": """Bring real estate prices
+into an era where they can be explained""",
+        "hero_cta_primary": "Try it free",
+        "hero_cta_secondary": "See details",
+        "hero_scroll_hint": "↓ Scroll",
         "top_cta_services": "Explore services",
         "top_cta_ai": "Explore AI tools",
         "m_kpi_office": "Office",
@@ -3156,42 +3168,168 @@ def _scroll_app_view_to_top() -> None:
 
 
 def render_top_hero() -> None:
-    """TOP用ヒーロー（ビジュアル・コピー・CTAを一連の導線に統一）。"""
+    """TOP用ヒーロー（フル幅背景・暗オーバーレイ・2段見出し・大型2CTA・スクロール誘導）。"""
     _hl = _lang()
-    _sub_html = "<br><br>".join(html.escape(line.strip()) for line in t("hero_sub").strip().splitlines() if line.strip())
+    _nav_mekiki = quote("価格の目利き", safe="")
+    _nav_services = quote("業務内容", safe="")
+    _head_html = "<br>".join(
+        html.escape(line.strip(), quote=True)
+        for line in t("hero_product_headline").strip().splitlines()
+        if line.strip()
+    )
     st.markdown(
         dedent(
             f"""
-            <div class="hero-visual hero-visual--fullvp" lang="{html.escape(_hl, quote=True)}">
-            <!-- トップ大ヒーロー：背景写真専用レイヤー（CSS で1枚だけ読み込み・filter はここに限定） -->
+            <style>
+            .hero-visual.hero-visual--fullvp.hero-visual--product::before {{
+              border-radius: 0 !important;
+              z-index: 1 !important;
+              background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%) !important;
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-inner.hero-inner--product {{
+              position: relative;
+              z-index: 2;
+              box-sizing: border-box;
+              min-height: 100vh;
+              min-height: 100dvh;
+              width: 100%;
+              padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(72px, 10vh, 120px);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-card {{
+              position: relative;
+              z-index: 1;
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto;
+              text-align: center;
+              color: #fff;
+              padding: clamp(1.5rem, 3.5vw, 2.5rem) clamp(1.25rem, 3vw, 2.25rem);
+              border-radius: 20px;
+              border: 1px solid rgba(201, 162, 77, 0.28);
+              background: rgba(15, 28, 46, 0.55);
+              box-shadow:
+                0 28px 64px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 1px 0 rgba(255, 255, 255, 0.08) inset;
+              -webkit-font-smoothing: antialiased;
+            }}
+            @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {{
+              .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-card {{
+                background: linear-gradient(
+                  155deg,
+                  rgba(15, 28, 46, 0.5) 0%,
+                  rgba(15, 28, 46, 0.36) 55%,
+                  rgba(24, 40, 62, 0.42) 100%
+                );
+                -webkit-backdrop-filter: blur(14px) saturate(1.1);
+                backdrop-filter: blur(14px) saturate(1.1);
+              }}
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-kicker {{
+              margin: 0 0 12px 0;
+              font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+              font-weight: 700;
+              letter-spacing: 0.12em;
+              text-transform: uppercase;
+              color: rgba(255, 255, 255, 0.82);
+              font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-title {{
+              margin: 0 0 clamp(1.25rem, 3vw, 1.75rem) 0;
+              font-size: clamp(1.85rem, 5vw, 3rem);
+              font-weight: 800;
+              line-height: 1.28;
+              letter-spacing: 0.02em;
+              color: #fff;
+              text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-buttons {{
+              display: flex;
+              flex-wrap: wrap;
+              gap: 16px;
+              justify-content: center;
+              align-items: center;
+              margin-top: 8px;
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn {{
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              box-sizing: border-box;
+              min-height: 60px;
+              padding: 0 clamp(1.5rem, 4vw, 2.25rem);
+              border-radius: 12px;
+              font-size: clamp(1rem, 2.2vw, 1.125rem);
+              font-weight: 700;
+              text-decoration: none;
+              cursor: pointer;
+              transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--primary {{
+              color: #fff;
+              background: #43a047;
+              border: 1px solid rgba(255, 255, 255, 0.12);
+              box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--primary:hover {{
+              background: #4caf50;
+              box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--secondary {{
+              color: #fff;
+              background: rgba(255, 255, 255, 0.06);
+              border: 2px solid rgba(255, 255, 255, 0.9);
+              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-btn--secondary:hover {{
+              background: rgba(255, 255, 255, 0.12);
+            }}
+            .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-scroll {{
+              position: absolute;
+              left: 50%;
+              bottom: clamp(16px, 3vh, 28px);
+              transform: translateX(-50%);
+              z-index: 3;
+              font-size: 0.875rem;
+              font-weight: 600;
+              letter-spacing: 0.08em;
+              color: rgba(255, 255, 255, 0.88);
+              text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+              animation: lib-hero-scroll-bounce 2s ease-in-out infinite;
+              pointer-events: none;
+            }}
+            @keyframes lib-hero-scroll-bounce {{
+              0%, 100% {{ transform: translate(-50%, 0); }}
+              50% {{ transform: translate(-50%, 10px); }}
+            }}
+            @media (prefers-reduced-motion: reduce) {{
+              .hero-visual.hero-visual--fullvp.hero-visual--product .hero-pro-scroll {{
+                animation: none !important;
+              }}
+            }}
+            </style>
+            <div class="hero-visual hero-visual--fullvp hero-visual--product" lang="{html.escape(_hl, quote=True)}">
             <div class="hero-visual__bg" aria-hidden="true"></div>
-            <div class="hero-inner">
-            <div class="hero-copy hero-copy-panel">
-            <p class="hero-tagline-jp">{html.escape(t("hero_kicker"), quote=True)}</p>
-            <p class="hero-micro-en" lang="en">Price is structure</p>
-            <div class="headline">{html.escape(t("hero_headline"), quote=True)}</div>
-            <div class="gold-line" aria-hidden="true"></div>
-            <div class="subcopy">
-{_sub_html}<br><br>
+            <div class="hero-inner hero-inner--product">
+            <div class="hero-pro-card">
+            <p class="hero-pro-kicker">{html.escape(t("hero_product_kicker"), quote=True)}</p>
+            <div class="hero-pro-title">{_head_html}</div>
+            <div class="hero-pro-buttons">
+            <a class="hero-pro-btn hero-pro-btn--primary" href="?nav={_nav_mekiki}">{html.escape(t("hero_cta_primary"), quote=True)}</a>
+            <a class="hero-pro-btn hero-pro-btn--secondary" href="?nav={_nav_services}">{html.escape(t("hero_cta_secondary"), quote=True)}</a>
             </div>
-            <p class="hero-footnote">{html.escape(t("hero_foot"), quote=True)}</p>
             </div>
+            <div class="hero-pro-scroll" aria-hidden="true">{html.escape(t("hero_scroll_hint"), quote=True)}</div>
             </div>
             </div>
             """
         ).strip(),
         unsafe_allow_html=True,
     )
-
-    cta1, cta2 = st.columns(2)
-    with cta1:
-        if st.button(t("top_cta_services"), key="top_cta_services", type="primary", width="stretch"):
-            st.session_state[NAV_PENDING_KEY] = "業務内容"
-            st.rerun()
-    with cta2:
-        if st.button(t("top_cta_ai"), key="top_cta_ai", type="secondary", width="stretch"):
-            st.session_state[NAV_PENDING_KEY] = "AI分析ツール"
-            st.rerun()
 
 
 def info_kpis():
