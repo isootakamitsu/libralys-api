@@ -1,2 +1,8 @@
+streamlit
+pandas
+numpy
+plotly
+pillow
+markdown
 fastapi
 uvicorn
