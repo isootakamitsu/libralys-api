@@ -713,12 +713,15 @@ After **Price Insight** clarifies how a price reads, this matching entry is desi
 
 def _migrate_legacy_text_keys() -> None:
     """過去の誤キー（空白・崩れ）を正規キーへ移す。値は変更しない。"""
+    # 誤キーに空白・誤綴りが含まれる場合のみ（正規キーは英数字＋_）。
     _pairs = (
         ("top_service_sect ion_title", "top_service_section_title"),
+        ("top_serv Ice_section_title", "top_service_section_title"),
         ("to p_svc_card3_title", "top_svc_card3_title"),
         ("to p_svc_card3_desc", "top_svc_card3_desc"),
         ("hero_cta_ Secondary", "hero_cta_secondary"),
         ("hero_cta_Secondary", "hero_cta_secondary"),
+        ("ne ws_empty_hint", "news_empty_hint"),
     )
     for _lang in ("ja", "en"):
         _b = TEXTS.get(_lang)
@@ -732,7 +735,19 @@ def _migrate_legacy_text_keys() -> None:
             del _b[_bad]
 
 
+def _assert_texts_keys_no_whitespace() -> None:
+    """誤った空白混入キーを禁止（正規キーは空白を含まない）。"""
+    for _lang in ("ja", "en"):
+        _b = TEXTS.get(_lang)
+        if not isinstance(_b, dict):
+            continue
+        for _k in _b:
+            if any(_c.isspace() for _c in _k):
+                raise AssertionError(f"TEXTS key must not contain whitespace: {_lang!r} {_k!r}")
+
+
 _migrate_legacy_text_keys()
+_assert_texts_keys_no_whitespace()
 
 assert "ja" in TEXTS and "en" in TEXTS
 assert "hero_headline" in TEXTS["ja"]
