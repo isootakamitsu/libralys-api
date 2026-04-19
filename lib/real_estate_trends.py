@@ -3,7 +3,7 @@
 不動産トレンド情報（信頼ソース中心・拡張前提）
 
 【運用】
-- 既定のトレンド行は本ファイル内の CURATED_TREND_ITEMS を編集して追加・更新する。
+- 既定のトレンド行は本ファイル内の CURATED_TREND_ITEMS に 1 件ずつ追加する（現状は空から開始）。
 - 任意で `data/trend_items.json`（配列JSON）を置くと、同一 `id` は上書き・新規 id は追加される。
 
 【将来の自動化拡張ポイント】
@@ -48,124 +48,11 @@ TREND_CSS_INJECTED_KEY = "_lib_trend_css_injected_v2"
 TREND_LLM_CACHE_KEY = "_lib_trend_llm_summary_cache"
 
 # ---------------------------------------------------------------------------
-# 【ここを編集】信頼性の高いソースのトレンド行（手動メンテ）
+# 【ここを編集】信頼性の高いソースのトレンド行（手動メンテ・1 件ずつ追加）
 # 各項目は title/summary は自サイト用の短い説明（1〜2行）に留める。
+# いったん空配列から再構築する（過去行の再利用なし）。
 # ---------------------------------------------------------------------------
-CURATED_TREND_ITEMS: List[Dict[str, Any]] = [
-    {
-        "id": "mlit-land-building-stats",
-        "source_key": "MLIT",
-        "source_url": "https://www.mlit.go.jp/statistics/",
-        "published_date": "2026-04-01",
-        "title_ja": "国土交通省｜土地・建物・住宅に関する統計（不動産価格指数等）",
-        "title_en": "MLIT — Land, building & housing statistics (incl. price indices)",
-        "summary_ja": "公示地価・不動産価格指数・土地取引等の公表一覧への入口。住宅・土地の価格動向を公的統計で確認する際の起点として利用可能。",
-        "summary_en": "Official entry point for published land and housing statistics including price-related indices. Use as a neutral baseline for market context.",
-        "category": "住宅",
-        "reliability_score": 1.0,
-        "popularity_score": 0.72,
-        "reliability_tier": "公的",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    {
-        "id": "mlit-press-releases",
-        "source_key": "MLIT",
-        "source_url": "https://www.mlit.go.jp/report/press/",
-        "published_date": "2026-03-20",
-        "title_ja": "国土交通省｜報道発表（土地・住宅・不動産関連の公式ニュース）",
-        "title_en": "MLIT — Press releases (land, housing & real estate)",
-        "summary_ja": "土地・住宅・都市政策等に関する報道発表の公式一覧。最新の制度・統計公表の確認に向く一次情報源。",
-        "summary_en": "Official press-release index for land, housing and urban policy—useful for first-party updates on statistics and policy notices.",
-        "category": "住宅",
-        "reliability_score": 1.0,
-        "popularity_score": 0.68,
-        "reliability_tier": "公的",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    {
-        "id": "miki-office-rent",
-        "source_key": "SANKI",
-        "source_url": "https://www.e-miki.com/rent/",
-        "published_date": "2026-03-28",
-        "title_ja": "三鬼商事｜オフィスマーケット（賃料・空室等の市況整理）",
-        "title_en": "Miki Shoji — Office market (rent & vacancy context)",
-        "summary_ja": "主要ビル市場の賃料・空室動向を月次で整理したオフィス市況レポート群への導線。需給・賃料トレンドの把握に向く。",
-        "summary_en": "Monthly office market materials focused on rent and vacancy trends—suited for supply/demand and rent trajectory reviews.",
-        "category": "オフィス",
-        "reliability_score": 0.88,
-        "popularity_score": 0.78,
-        "reliability_tier": "業界",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    {
-        "id": "japan-reit-portal",
-        "source_key": "JREIT",
-        "source_url": "https://www.japan-reit.com/",
-        "published_date": "2026-04-05",
-        "title_ja": "JAPAN-REIT.COM｜J-REITの指数・開示・話題の整理ポータル",
-        "title_en": "JAPAN-REIT.COM — J-REIT indices, disclosures & topics",
-        "summary_ja": "東証REIT指数の概況、銘柄ニュース、コラム等へ分類アクセス可能。取得・譲渡・決算トレンドの素早い把握の補助として利用。",
-        "summary_en": "Structured access to index moves, issuer news and columns—supporting quick scans of acquisition, disposal and earnings-related themes.",
-        "category": "J-REIT",
-        "reliability_score": 0.82,
-        "popularity_score": 0.74,
-        "reliability_tier": "業界",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    {
-        "id": "japan-reit-topics",
-        "source_key": "JREIT",
-        "source_url": "https://www.japan-reit.com/topic/",
-        "published_date": "2026-04-02",
-        "title_ja": "JAPAN-REIT.COM｜銘柄ニュース（開示・話題の年次インデックス）",
-        "title_en": "JAPAN-REIT.COM — Ticker news index",
-        "summary_ja": "銘柄別の開示・話題を時系列で辿れるインデックス。ポートフォリオ銘柄のイベント確認の出発点として利用可能。",
-        "summary_en": "Ticker-level news index for time-ordered scanning—useful as a starting point for issuer-specific event checks.",
-        "category": "J-REIT",
-        "reliability_score": 0.82,
-        "popularity_score": 0.62,
-        "reliability_tier": "業界",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    {
-        "id": "cbre-japan-insights",
-        "source_key": "CBRE",
-        "source_url": "https://www.cbre.co.jp/insights/",
-        "published_date": "2026-03-15",
-        "title_ja": "CBRE｜Japan Insights（オフィス・投資・各セクターのレポート入口）",
-        "title_en": "CBRE — Japan insights (multi-sector reports)",
-        "summary_ja": "大手仲介の調査レポート・コメントへの入口。オフィス需給、投資マーケット等の業界整理を参照する際の二次ソースとして位置づけ可能。",
-        "summary_en": "Gateway to broker research and commentary—position as secondary industry context alongside primary official statistics.",
-        "category": "商業",
-        "reliability_score": 0.78,
-        "popularity_score": 0.58,
-        "reliability_tier": "業界",
-        "archived": False,
-        "use_llm_summary": False,
-    },
-    # アーカイブ例（運用時は `archived: True` で過去枠へ）
-    {
-        "id": "mlit-legacy-sample-archived",
-        "source_key": "MLIT",
-        "source_url": "https://www.mlit.go.jp/",
-        "published_date": "2025-08-01",
-        "title_ja": "（アーカイブ例）国土交通省トップ｜報道発表・統計の再探索",
-        "title_en": "(Archive sample) MLIT top — press & statistics",
-        "summary_ja": "過去に掲載していた案内の置き場所例。運用では古いトピックを `archived: True` にして整理する。",
-        "summary_en": "Placeholder for retired highlights; keep stale items under archived for clarity.",
-        "category": "住宅",
-        "reliability_score": 1.0,
-        "popularity_score": 0.35,
-        "reliability_tier": "公的",
-        "archived": True,
-        "use_llm_summary": False,
-    },
-]
+CURATED_TREND_ITEMS: List[Dict[str, Any]] = []
 
 SOURCE_KEY_TO_GROUP = {
     "MLIT": "kokudo",

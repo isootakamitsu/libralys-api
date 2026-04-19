@@ -743,15 +743,19 @@ def _migrate_legacy_text_keys() -> None:
 def _assert_texts_keys_shape_for_api_json() -> None:
     """
     API 用 JSON キー規約:
-    - 空白禁止
-    - `nav_` 以外は英字・数字・アンダースコアのみ（ASCII）
+    - キー内の空白禁止（誤入力は _migrate_legacy_text_keys で正規キーへ集約）
+    - `nav_` 以外は英字・数字・アンダースコアのみ（ASCII [A-Za-z0-9_]）
     - `nav_*` は Streamlit ページ表記との整合のため非 ASCII を許容（空白のみ禁止）
+    - 同一言語バケット内でキー重複禁止
     """
     _ascii_only = re.compile(r"^[A-Za-z0-9_]+$")
     for _lang in ("ja", "en"):
         _b = TEXTS.get(_lang)
         if not isinstance(_b, dict):
             continue
+        _ks = list(_b.keys())
+        if len(_ks) != len(set(_ks)):
+            raise AssertionError(f"duplicate TEXTS keys in {_lang!r}")
         for _k in _b:
             if any(_c.isspace() for _c in _k):
                 raise AssertionError(f"TEXTS key must not contain whitespace: {_lang!r} {_k!r}")

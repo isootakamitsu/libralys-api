@@ -69,6 +69,7 @@ from textwrap import dedent
 
 import streamlit.components.v1 as components
 
+from lib.streamlit_top_nav import HERO_CTA_PRIMARY_PAGE, HERO_CTA_SECONDARY_PAGE, TOP_SERVICE_CARD_NAV
 from lib.ai_catalog import (
     flush_multipage_new_tab_opener,
     inject_ai_tool_catalog_card_css,
@@ -3396,8 +3397,8 @@ def _standalone_hero_background_css_url() -> str:
 def render_top_hero() -> None:
     """TOP ヒーロー（HTML のみ。見た目用 CSS は `page == \"TOP\"` 先頭の style に `_top_immersive_css_block()` で集約）。"""
     _hl = _lang()
-    _nav_mekiki = quote("価格の目利き", safe="")
-    _nav_services = quote("業務内容", safe="")
+    _nav_mekiki = quote(HERO_CTA_PRIMARY_PAGE, safe="")
+    _nav_services = quote(HERO_CTA_SECONDARY_PAGE, safe="")
     _hl_raw = (t("hero_product_headline") or "").strip()
     _hl_lines = [ln.strip() for ln in _hl_raw.splitlines() if ln.strip()]
     _head_html = (
@@ -3432,9 +3433,9 @@ def render_top_hero() -> None:
 
 def render_top_service_cards_section() -> None:
     """TOP: Hero 直下のサービスカード（3列／モバイル1列・?nav 短リンク）。"""
-    _nav_mekiki = quote("価格の目利き", safe="")
-    _nav_dcf = "DCF"
-    _nav_business = quote("業務内容", safe="")
+    _nav_mekiki = quote(TOP_SERVICE_CARD_NAV[0], safe="")
+    _nav_dcf = TOP_SERVICE_CARD_NAV[1]
+    _nav_business = quote(TOP_SERVICE_CARD_NAV[2], safe="")
     _t1 = html.escape(t("top_svc_card1_title"), quote=True)
     _d1 = html.escape(t("top_svc_card1_desc"), quote=True)
     _t2 = html.escape(t("top_svc_card2_title"), quote=True)

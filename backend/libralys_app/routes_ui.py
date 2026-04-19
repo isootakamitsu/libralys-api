@@ -1,12 +1,8 @@
 # ============================================================
-# UI Routes
+# UI Routes（将来の /api/ui/* をここへ）
+# GET /api/ui/top は backend/main.py の get_ui_top に統一
 # ============================================================
 
-from fastapi import APIRouter, Query
-from .ui_build import build_ui_top
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/ui", tags=["ui"])
-
-@router.get("/top")
-def ui_top(lang: str = Query("ja")):
-    return build_ui_top(lang)

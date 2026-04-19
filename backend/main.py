@@ -19,7 +19,7 @@ from lib.top_corporate import load_top_news_sorted
 from lib.real_estate_trends import fetch_trend_items
 from data.texts import TEXTS
 
-from libralys_app.routes_ui import router as ui_router
+from libralys_app.top_payload import build_streamlit_top_json
 
 app = FastAPI()
 
@@ -43,43 +43,8 @@ async def get_texts(lang: str = "ja"):
 @app.get("/api/ui/top")
 async def get_ui_top(lang: str = "ja"):
     lg = lang if lang in ("ja", "en") else "ja"
-
     texts = TEXTS.get(lg, TEXTS["ja"])
-
-    news = load_top_news_sorted(BASE_DIR, lang=lg)
-    if not news:
-        news = [
-            {
-                "date": "2026-01-01",
-                "category": "お知らせ",
-                "title": "ニュース準備中",
-                "body": "ニュースデータは現在準備中です。",
-                "importance": 0,
-                "link": ""
-            }
-        ]
-
-    trends = fetch_trend_items(BASE_DIR)
-    if not trends:
-        trends = [
-            {
-                "title_ja": "市場データ準備中",
-                "summary_ja": "トレンドデータは現在準備中です。",
-                "source_url": "",
-                "category": "市場",
-                "published_date": "2026-01-01",
-                "reliability_tier": "C"
-            }
-        ]
-
-    return {
-        "status": "ok",
-        "data": {
-            "texts": texts,
-            "news": news,
-            "trends": trends,
-        },
-    }
+    return build_streamlit_top_json(lg, BASE_DIR, texts)
 
 
 @app.get("/api/top-news")
@@ -92,9 +57,6 @@ def get_top_news(lang: str = "ja"):
 def get_top_trends():
     return fetch_trend_items(BASE_DIR)
 
-
-# ---------------- Router ----------------
-app.include_router(ui_router)
 
 # ---------------- Root ----------------
 @app.get("/")
