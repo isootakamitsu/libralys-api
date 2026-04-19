@@ -709,3 +709,38 @@ After **Price Insight** clarifies how a price reads, this matching entry is desi
         "contact_svc_extra_other": "Other",
     }
 )
+
+
+def _migrate_legacy_text_keys() -> None:
+    """過去の誤キー（空白・崩れ）を正規キーへ移す。値は変更しない。"""
+    _pairs = (
+        ("top_service_sect ion_title", "top_service_section_title"),
+        ("to p_svc_card3_title", "top_svc_card3_title"),
+        ("to p_svc_card3_desc", "top_svc_card3_desc"),
+        ("hero_cta_ Secondary", "hero_cta_secondary"),
+        ("hero_cta_Secondary", "hero_cta_secondary"),
+    )
+    for _lang in ("ja", "en"):
+        _b = TEXTS.get(_lang)
+        if not isinstance(_b, dict):
+            continue
+        for _bad, _good in _pairs:
+            if _bad not in _b:
+                continue
+            if _good not in _b:
+                _b[_good] = _b[_bad]
+            del _b[_bad]
+
+
+_migrate_legacy_text_keys()
+
+assert "ja" in TEXTS and "en" in TEXTS
+assert "hero_headline" in TEXTS["ja"]
+assert "hero_headline" in TEXTS["en"]
+assert "hero_product_headline" in TEXTS["ja"]
+assert "hero_cta_secondary" in TEXTS["ja"]
+assert "top_service_section_title" in TEXTS["ja"]
+assert "top_svc_card3_title" in TEXTS["ja"]
+assert "top_svc_card3_desc" in TEXTS["ja"]
+assert "news_section_mast" in TEXTS["ja"]
+assert "trend_section_title" in TEXTS["ja"]

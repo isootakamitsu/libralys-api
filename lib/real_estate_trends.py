@@ -224,13 +224,53 @@ def split_archive_by_month(archived_items: List[Dict[str, Any]]) -> List[Tuple[s
     return out
 
 
+def _normalize_trend_row_keys(row: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    JSON 手編集で混入しがちなキーの空白・全角空白・連続空白を正規化する。
+    同一正規キーへの衝突時は、非空でより長い文字列を優先（要約の欠損取り込み用）。
+    """
+    out: Dict[str, Any] = {}
+    for k, v in row.items():
+        if not isinstance(k, str):
+            continue
+        nk = k.strip().replace("\ufeff", "").replace("\u3000", " ").replace("\u00a0", " ")
+        nk = re.sub(r"\s+", "_", nk.strip())
+        nk = re.sub(r"_+", "_", nk)
+        if nk not in out:
+            out[nk] = v
+            continue
+        ov = out[nk]
+        if isinstance(ov, str) and isinstance(v, str):
+            a, b = ov.strip(), v.strip()
+            if not a and b:
+                out[nk] = v
+            elif a and b and len(b) > len(a):
+                out[nk] = v
+        elif (ov in (None, "", [], {})) and v not in (None, "", [], {}):
+            out[nk] = v
+    return out
+
+
+def _trend_scalar_str(v: Any) -> str:
+    if v is None:
+        return ""
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, (list, dict)):
+        try:
+            return json.dumps(v, ensure_ascii=False)
+        except TypeError:
+            return str(v).strip()
+    return str(v).strip()
+
+
 def fetch_trend_items(base_dir: Path) -> List[Dict[str, Any]]:
     """手動配列＋任意JSONをマージして生データを返す（将来は外部取得をここに接続）。"""
     merged: Dict[str, Dict[str, Any]] = {}
     for row in CURATED_TREND_ITEMS:
         rid = str(row.get("id", "")).strip()
         if rid:
-            merged[rid] = dict(row)
+            merged[rid] = _normalize_trend_row_keys(dict(row))
     json_path = base_dir / "data" / "trend_items.json"
     if json_path.is_file():
         try:
@@ -238,9 +278,10 @@ def fetch_trend_items(base_dir: Path) -> List[Dict[str, Any]]:
             if isinstance(raw, list):
                 for row in raw:
                     if isinstance(row, dict):
+                        row = _normalize_trend_row_keys(dict(row))
                         rid = str(row.get("id", "")).strip()
                         if rid:
-                            base = merged.get(rid, {})
+                            base = _normalize_trend_row_keys(dict(merged.get(rid, {})))
                             base.update(row)
                             merged[rid] = base
         except (OSError, json.JSONDecodeError):
@@ -252,7 +293,7 @@ def normalize_trend_items(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """キー欠損を埋め、日付を正規化する。"""
     out: List[Dict[str, Any]] = []
     for raw in items:
-        row = dict(raw)
+        row = _normalize_trend_row_keys(dict(raw))
         row.setdefault("id", re.sub(r"\W+", "-", str(row.get("title_ja", "item"))).strip("-").lower()[:48] or "item")
         row.setdefault("source_key", "OTHER")
         row.setdefault("source_url", "https://www.mlit.go.jp/")
@@ -261,6 +302,10 @@ def normalize_trend_items(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         row.setdefault("title_en", row["title_ja"])
         row.setdefault("summary_ja", "")
         row.setdefault("summary_en", row.get("summary_ja", ""))
+        row["title_ja"] = _trend_scalar_str(row.get("title_ja", "")) or "（タイトル未設定）"
+        row["title_en"] = _trend_scalar_str(row.get("title_en", "")) or row["title_ja"]
+        row["summary_ja"] = _trend_scalar_str(row.get("summary_ja", ""))
+        row["summary_en"] = _trend_scalar_str(row.get("summary_en", "")) or row["summary_ja"]
         cat = str(row.get("category", "住宅"))
         if cat not in VALID_CATEGORIES:
             cat = "住宅"
