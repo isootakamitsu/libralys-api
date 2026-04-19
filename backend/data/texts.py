@@ -1,3 +1,4 @@
+import re
 from typing import Dict
 
 TEXTS: Dict[str, Dict[str, str]] = {
@@ -722,6 +723,10 @@ def _migrate_legacy_text_keys() -> None:
         ("hero_cta_ Secondary", "hero_cta_secondary"),
         ("hero_cta_Secondary", "hero_cta_secondary"),
         ("ne ws_empty_hint", "news_empty_hint"),
+        ("h ealth_expander", "health_expander"),
+        ("he alth_expander", "health_expander"),
+        ("news_section_ mast", "news_section_mast"),
+        ("news_section_ma st", "news_section_mast"),
     )
     for _lang in ("ja", "en"):
         _b = TEXTS.get(_lang)
@@ -735,8 +740,14 @@ def _migrate_legacy_text_keys() -> None:
             del _b[_bad]
 
 
-def _assert_texts_keys_no_whitespace() -> None:
-    """誤った空白混入キーを禁止（正規キーは空白を含まない）。"""
+def _assert_texts_keys_shape_for_api_json() -> None:
+    """
+    API 用 JSON キー規約:
+    - 空白禁止
+    - `nav_` 以外は英字・数字・アンダースコアのみ（ASCII）
+    - `nav_*` は Streamlit ページ表記との整合のため非 ASCII を許容（空白のみ禁止）
+    """
+    _ascii_only = re.compile(r"^[A-Za-z0-9_]+$")
     for _lang in ("ja", "en"):
         _b = TEXTS.get(_lang)
         if not isinstance(_b, dict):
@@ -744,10 +755,16 @@ def _assert_texts_keys_no_whitespace() -> None:
         for _k in _b:
             if any(_c.isspace() for _c in _k):
                 raise AssertionError(f"TEXTS key must not contain whitespace: {_lang!r} {_k!r}")
+            if str(_k).startswith("nav_"):
+                continue
+            if not _ascii_only.match(str(_k)):
+                raise AssertionError(
+                    f"TEXTS key must be ASCII [A-Za-z0-9_] (except nav_*): {_lang!r} {_k!r}"
+                )
 
 
 _migrate_legacy_text_keys()
-_assert_texts_keys_no_whitespace()
+_assert_texts_keys_shape_for_api_json()
 
 assert "ja" in TEXTS and "en" in TEXTS
 assert "hero_headline" in TEXTS["ja"]

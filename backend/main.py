@@ -81,6 +81,18 @@ async def get_ui_top(lang: str = "ja"):
         },
     }
 
+
+@app.get("/api/top-news")
+def get_top_news(lang: str = "ja"):
+    lg = lang if lang in ("ja", "en") else "ja"
+    return load_top_news_sorted(BASE_DIR, lang=lg)
+
+
+@app.get("/api/top-trends")
+def get_top_trends():
+    return fetch_trend_items(BASE_DIR)
+
+
 # ---------------- Router ----------------
 app.include_router(ui_router)
 
