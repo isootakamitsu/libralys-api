@@ -1,1 +1,3 @@
+# backend からのワンコマンド用（中身はリポジトリルートに集約）
+-r ../requirements.txt
 
